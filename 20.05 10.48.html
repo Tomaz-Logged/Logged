@@ -1,0 +1,2154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Logged"/>
+<meta name="theme-color" content="#0a0c10"/>
+<title>Logged</title>
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Logged%22%2C%22short_name%22%3A%22Logged%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0c10%22%2C%22theme_color%22%3A%22%230a0c10%22%7D"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+
+  /* Dark theme (default) */
+  :root {
+    --bg: #080b12;
+    --bg-grad: radial-gradient(ellipse at 0% 0%, #1a0a2e 0%, transparent 60%), radial-gradient(ellipse at 100% 0%, #0d1f2d 0%, transparent 55%), radial-gradient(ellipse at 100% 100%, #00251a 0%, transparent 60%), radial-gradient(ellipse at 0% 100%, #130d28 0%, transparent 55%), #080b12;
+    --surface: #0f1318;
+    --surface2: #111418;
+    --border: #1a2030;
+    --border2: #1e2530;
+    --border3: #2d3748;
+    --text: #e2e8f0;
+    --text2: #a0aec0;
+    --text3: #718096;
+    --text4: #4a5568;
+    --text5: #2d3748;
+    --nav-bg: rgba(8,11,18,0.75);
+    --ticker-bg: rgba(8,11,18,0.5);
+    --tag-bg: #1a2030;
+    --input-bg: #111418;
+    --accent: #00e5a0;
+    --accent-dim: #00e5a060;
+    --accent-bg: #00e5a015;
+  }
+
+  /* Light theme — inverted dark theme */
+  .light {
+    --bg: #e2e8f0;
+    --bg-grad: radial-gradient(ellipse at 0% 0%, #d4c5f0 0%, transparent 60%), radial-gradient(ellipse at 100% 0%, #c5d4e0 0%, transparent 55%), radial-gradient(ellipse at 100% 100%, #b8e8d8 0%, transparent 60%), radial-gradient(ellipse at 0% 100%, #ccc0e8 0%, transparent 55%), #e2e8f0;
+    --surface: #f0f4f8;
+    --surface2: #eef0f7;
+    --border: #d0d8e8;
+    --border2: #c0cad8;
+    --border3: #a0adc0;
+    --text: #0a0c10;
+    --text2: #1a2030;
+    --text3: #2d3748;
+    --text4: #4a5568;
+    --text5: #718096;
+    --nav-bg: rgba(226,232,240,0.88);
+    --ticker-bg: rgba(226,232,240,0.75);
+    --tag-bg: #d8e0ec;
+    --input-bg: #eef0f7;
+    --accent: #007a52;
+    --accent-dim: #007a5290;
+    --accent-bg: #007a5218;
+  }
+
+  html,body{height:100%;overflow:hidden;color:var(--text);font-family:'DM Mono','Courier New',monospace;}
+  #app{display:flex;flex-direction:column;height:100%;height:-webkit-fill-available;overflow:hidden;
+    background: var(--bg-grad);
+    background-attachment: fixed;
+    transition: background 0.4s ease;
+  }
+  .content{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;padding-bottom:120px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+  ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--border3);border-radius:2px}
+  input,select,textarea{font-family:'DM Mono',monospace;font-size:16px;color:var(--text);}
+
+  .header{flex-shrink:0;border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);height:calc(52px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);}
+  .bottom-nav{flex-shrink:0;position:fixed;bottom:0;left:0;right:0;background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:100;}
+  .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0;gap:4px;cursor:pointer;background:none;border:none;color:var(--text4);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;transition:all 0.2s;}
+  .nav-icon-wrap{width:48px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:12px;transition:all 0.2s;}
+  .nav-item.active .nav-icon-wrap{background:var(--accent-bg);}
+  .nav-item.active svg{filter:drop-shadow(0 0 5px var(--accent-dim));}
+  .nav-item.active{color:var(--accent);}
+  .nav-icon{font-size:18px;}
+
+  .ticker{border-bottom:1px solid var(--border);padding:8px 16px;display:flex;gap:24px;overflow-x:auto;flex-shrink:0;-webkit-overflow-scrolling:touch;background:var(--ticker-bg);}
+  .ticker::-webkit-scrollbar{display:none;}
+  .tick-item{flex-shrink:0;}
+  .tick-label{font-size:8px;letter-spacing:0.15em;color:var(--text4);text-transform:uppercase;margin-bottom:2px;}
+  .tick-value{font-size:13px;font-weight:500;color:var(--text);}
+
+  .field-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text4);margin-bottom:6px;display:block;}
+  .field-input{width:100%;background:var(--input-bg);border:1px solid var(--border2);border-radius:8px;padding:12px;color:var(--text);font-size:16px;outline:none;-webkit-appearance:none;appearance:none;}
+  .field-input:focus{border-color:var(--accent);}
+  select.field-input{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%234a5568'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:var(--input-bg);}
+  .field-group{margin-bottom:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .dir-btn{flex:1;padding:12px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;font-size:14px;font-family:'DM Mono',monospace;background:var(--input-bg);color:var(--text4);transition:all 0.15s;}
+  .dir-btn.long-active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent);}
+  .dir-btn.short-active{border-color:#ff4d6d;background:#ff4d6d10;color:#ff4d6d;}
+
+  .pnl-preview{background:var(--surface);border-radius:8px;padding:14px;margin-bottom:14px;display:flex;gap:24px;}
+  .pnl-box label{font-size:8px;letter-spacing:0.15em;color:var(--text4);text-transform:uppercase;display:block;margin-bottom:3px;}
+  .pnl-box span{font-size:22px;font-weight:500;}
+
+  .btn-primary{width:100%;background:#00e5a0;color:#0a0c10;border:none;border-radius:8px;padding:14px;font-family:'DM Mono',monospace;font-size:13px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;}
+  .btn-ghost{background:none;border:1px solid var(--border3);border-radius:6px;padding:8px 14px;color:var(--text3);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
+  .btn-danger{background:none;border:1px solid #ff4d6d30;border-radius:6px;padding:8px 14px;color:#ff4d6d60;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
+
+  .trade-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  .trade-card-header{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;}
+  .trade-card-body{padding:0 14px 14px;border-top:1px solid var(--border);}
+  .trade-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+  .tag{display:inline-block;background:var(--tag-bg);border-radius:4px;padding:3px 8px;font-size:10px;letter-spacing:0.06em;color:var(--text3);}
+
+  .date-sep{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text4);padding:10px 0 6px;display:flex;align-items:center;gap:10px;}
+  .date-sep::after{content:"";flex:1;height:1px;background:var(--border);}
+
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;}
+  .stat-label{font-size:8px;letter-spacing:0.15em;color:var(--text4);text-transform:uppercase;margin-bottom:6px;}
+  .stat-value{font-size:22px;font-weight:500;color:var(--text);}
+  .stat-sub{font-size:11px;color:var(--text4);margin-top:2px;}
+
+  .upload-zone{border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;cursor:pointer;background:var(--bg);margin-bottom:10px;}
+  .upload-zone.drag{border-color:var(--accent);background:var(--accent-bg);}
+  .thumb-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+  .thumb-wrap{position:relative;}
+  .thumb-wrap img{width:80px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--border);}
+  .thumb-del{position:absolute;top:-6px;right:-6px;background:#ff4d6d;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:999;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+  .lightbox img{max-width:95vw;max-height:80vh;object-fit:contain;border-radius:6px;}
+  .lightbox-close{position:fixed;top:calc(16px + env(safe-area-inset-top));right:16px;background:none;border:none;color:var(--text3);font-size:26px;cursor:pointer;}
+  .lightbox-nav{display:flex;gap:16px;margin-top:16px;align-items:center;}
+  .lightbox-nav button{background:var(--border3);border:none;color:var(--text);border-radius:6px;padding:8px 18px;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;}
+  .lightbox-nav button:disabled{background:var(--border);color:var(--text4);cursor:default;}
+
+  .export-btn{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text2);font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;width:100%;margin-bottom:14px;}
+  .streak-badge{display:inline-flex;align-items:center;gap:4px;background:var(--tag-bg);border-radius:20px;padding:4px 10px;font-size:11px;}
+  .empty{text-align:center;padding:60px 20px;}
+  .section-title{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--text);margin-bottom:16px;}
+
+  /* Confirm dialog */
+  .confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:998;display:flex;align-items:flex-end;}
+  .confirm-sheet{background:#0f1318;border:1px solid #1a2030;border-radius:16px 16px 0 0;padding:24px 20px;width:100%;padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+  .confirm-title{font-family:'Syne',sans-serif;font-size:16px;color:#fff;margin-bottom:6px;}
+  .confirm-sub{font-size:12px;color:#718096;margin-bottom:20px;}
+  .confirm-btns{display:flex;flex-direction:column;gap:10px;}
+
+  .empty{text-align:center;padding:60px 20px;}
+  .empty-icon{font-size:44px;margin-bottom:14px;}
+  .empty-title{font-family:'Syne',sans-serif;font-size:20px;color:var(--text4);margin-bottom:8px;}
+  .empty-sub{font-size:12px;color:var(--text5);margin-bottom:24px;}
+
+  
+
+  .install-banner{background:var(--accent-bg);border:1px solid var(--accent-dim);border-radius:10px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+  .install-banner p{font-size:11px;color:#a0aec0;line-height:1.5;flex:1;}
+  .install-banner button{background:var(--accent);color:#0a0c10;border:none;border-radius:6px;padding:8px 14px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;white-space:nowrap;}
+
+  .export-btn{display:flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2030;border-radius:8px;padding:12px 14px;color:#a0aec0;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;width:100%;margin-bottom:14px;}
+  .export-btn:hover{border-color:#2d3748;}
+
+  .streak-badge{display:inline-flex;align-items:center;gap:4px;background:#1a2030;border-radius:20px;padding:4px 10px;font-size:11px;}
+
+  /* Splash Screen */
+  .splash{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;
+    background:radial-gradient(ellipse at 0% 0%,#1a0a2e 0%,transparent 60%),radial-gradient(ellipse at 100% 100%,#00251a 0%,transparent 60%),#080b12;
+    transition:opacity 0.7s ease;
+  }
+  .splash.fade{opacity:0;pointer-events:none;}
+  @keyframes logoIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+  @keyframes subIn{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:translateY(0)}}
+  @keyframes barGrow{0%{width:0%}100%{width:100%}}
+  @keyframes glowPulse{0%,100%{box-shadow:0 0 10px #00e5a030}50%{box-shadow:0 0 30px #00e5a060}}
+  .splash-logo{animation:logoIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both;}
+  .splash-sub{animation:subIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.5s both;}
+  .splash-bar-wrap{width:140px;height:2px;background:#1a2030;border-radius:1px;overflow:hidden;margin-top:40px;}
+  .splash-bar{height:100%;background:linear-gradient(90deg,#00e5a020,#00e5a0,#00e5a020);border-radius:1px;animation:barGrow 1.6s cubic-bezier(0.4,0,0.2,1) 0.4s both;}
+
+  /* PIN Screen */
+  .pin-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 32px;padding-top:env(safe-area-inset-top);z-index:500;}
+  .pin-dots{display:flex;gap:14px;margin:28px 0 36px;}
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid #2d3748;transition:all 0.15s;}
+  .pin-dot.filled{background:var(--accent);border-color:var(--accent);box-shadow:0 0 8px var(--accent-dim);}
+  .pin-dot.error{background:#ff4d6d;border-color:#ff4d6d;}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:280px;}
+  .pin-btn{background:rgba(255,255,255,0.05);border:1px solid #1a2030;border-radius:14px;padding:18px;font-size:22px;font-family:'Syne',sans-serif;font-weight:700;color:#e2e8f0;cursor:pointer;transition:all 0.1s;text-align:center;}
+  .pin-btn:active{background:var(--accent-bg);border-color:var(--accent-dim);transform:scale(0.95);}
+  .pin-btn.del{font-size:18px;color:#718096;}
+  .pin-name-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid #1e2530;border-radius:10px;padding:14px;color:#e2e8f0;font-size:18px;text-align:center;outline:none;font-family:'DM Mono',monospace;letter-spacing:0.05em;}
+  .pin-name-input:focus{border-color:var(--accent);}
+  .pin-name-input::placeholder{color:#2d3748;}
+
+  .pos{color:var(--accent);}.neg{color:#ff4d6d;}
+  svg text{font-family:'DM Mono',monospace;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
+
+const INSTRUMENTS = [
+  { symbol:"ES", name:"E-mini S&P 500", tickSize:0.25, tickValue:12.5 },
+  { symbol:"MES", name:"Micro E-mini S&P", tickSize:0.25, tickValue:1.25 },
+  { symbol:"NQ", name:"E-mini Nasdaq-100", tickSize:0.25, tickValue:5 },
+  { symbol:"MNQ", name:"Micro Nasdaq-100", tickSize:0.25, tickValue:0.5 },
+  { symbol:"YM", name:"E-mini Dow Jones", tickSize:1, tickValue:5 },
+  { symbol:"MYM", name:"Micro E-mini Dow", tickSize:1, tickValue:0.5 },
+  { symbol:"GC", name:"Gold", tickSize:0.10, tickValue:10 },
+  { symbol:"MGC", name:"Micro Gold", tickSize:0.10, tickValue:1 },
+  { symbol:"CL", name:"Crude Oil", tickSize:0.01, tickValue:10 },
+  { symbol:"SI", name:"Silver", tickSize:0.005, tickValue:25 },
+];
+const STRATEGIES = ["Breakout","Mean Reversion","Trend Follow","VWAP Fade","Open Drive","Failed Auction","Scalp","Swing","Other"];
+const SESSIONS = ["Asia","London","New York"];
+const SETUPS = ["A+","A","B","C"];
+const EMOTIONS = ["😌 Calm","💪 Confident","😰 Anxious","😤 Frustrated","🤑 Greedy","😨 FOMO","😡 Revenge","🎯 Focused"];
+const STORAGE_KEY = "logged_v1";
+const BALANCE_KEY = "logged_balance_v1";
+const CURRENCY_KEY = "logged_currency_v1";
+const THEME_KEY = "logged_theme_v1";
+const GOAL_COLOUR_KEY = "logged_goal_colour_v1";
+const CURRENCIES = [
+  {code:"USD", symbol:"$", locale:"en-US"},
+  {code:"GBP", symbol:"£", locale:"en-GB"},
+  {code:"EUR", symbol:"€", locale:"de-DE"},
+];
+
+const blankForm = () => ({
+  date: new Date().toISOString().split("T")[0],
+  instrument:"NQ", direction:"Long", contracts:1,
+  entry:"", stop:"",
+  outcome:"TP",
+  emotion:"",
+  tps:[{price:"", contracts:""}],
+  strategy:"Breakout", session:"New York", setup:"A",
+  notes:"", images:[], checklist:[]
+});
+
+function calc(t) {
+  const inst = INSTRUMENTS.find(i=>i.symbol===t.instrument);
+  if(!inst||!t.entry) return {pnl:0,ticks:0,r:null,avgExit:null};
+  const dir = t.direction==="Long"?1:-1;
+
+  // SL outcome — use stop price
+  if(t.outcome==="SL"&&t.stop) {
+    const ticks = dir*(parseFloat(t.stop)-parseFloat(t.entry))/inst.tickSize;
+    const pnl = ticks*inst.tickValue*(parseInt(t.contracts)||1);
+    const r = -1; // always -1R when stopped out
+    return {pnl, ticks:Math.round(ticks*10)/10, r, avgExit:parseFloat(t.stop)};
+  }
+
+  // Breakeven outcome
+  if(t.outcome==="BE") {
+    return {pnl:0, ticks:0, r:0, avgExit:parseFloat(t.entry)};
+  }
+
+  const tps = (t.tps||[]).filter(tp=>tp.price&&tp.contracts);
+
+  // Legacy: old trade with exit field
+  if(!tps.length && t.exit) {
+    const ticks = dir*(parseFloat(t.exit)-parseFloat(t.entry))/inst.tickSize;
+    const pnl = ticks*inst.tickValue*(parseInt(t.contracts)||1);
+    const st = t.stop ? Math.abs(parseFloat(t.entry)-parseFloat(t.stop))/inst.tickSize : null;
+    const r = st ? Math.round(ticks/st*100)/100 : null;
+    return {pnl, ticks:Math.round(ticks*10)/10, r, avgExit:parseFloat(t.exit)};
+  }
+  if(!tps.length) return {pnl:0,ticks:0,r:null,avgExit:null};
+
+  // Weighted average exit across all TPs
+  const totalContracts = tps.reduce((s,tp)=>s+(parseInt(tp.contracts)||0),0);
+  const weightedExit = tps.reduce((s,tp)=>s+(parseFloat(tp.price)||0)*(parseInt(tp.contracts)||0),0) / totalContracts;
+  const ticks = dir*(weightedExit-parseFloat(t.entry))/inst.tickSize;
+  const gross = tps.reduce((s,tp)=>{
+    const tpTicks = dir*(parseFloat(tp.price)-parseFloat(t.entry))/inst.tickSize;
+    return s + tpTicks*inst.tickValue*(parseInt(tp.contracts)||0);
+  },0);
+  const pnl = gross;
+  const st = t.stop ? Math.abs(parseFloat(t.entry)-parseFloat(t.stop))/inst.tickSize : null;
+  const r = st ? Math.round(ticks/st*100)/100 : null;
+  return {pnl, ticks:Math.round(ticks*10)/10, r, avgExit:Math.round(weightedExit*100)/100};
+}
+
+const fmt = n=>`${n>=0?"+":"-"}$${Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+const fmts = n=>`$${Math.abs(n).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0})}`;
+
+function exportExcel(trades) {
+  // Build a simple XML-based Excel file (works without libraries)
+  const headers = ["Date","Instrument","Direction","Contracts","Entry","TP1","TP1 Qty","TP2","TP2 Qty","TP3","TP3 Qty","Avg Exit","Stop","Ticks","P&L","R","Outcome","Strategy","Session","Setup","Notes"];
+  const rows = trades.map(t => {
+    const {pnl,ticks,r,avgExit} = calc(t);
+    const tps = t.tps||[];
+    return [t.date,t.instrument,t.direction,t.contracts,t.entry,
+      tps[0]?.price||"",tps[0]?.contracts||"",
+      tps[1]?.price||"",tps[1]?.contracts||"",
+      tps[2]?.price||"",tps[2]?.contracts||"",
+      avgExit||"",t.stop||"",ticks,pnl.toFixed(2),r||"",
+      t.outcome||"TP",t.strategy,t.session,t.setup,t.notes||""
+    ];
+  });
+
+  let xml = `<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+<Styles><Style ss:ID="h"><Font ss:Bold="1"/><Interior ss:Color="#0a0c10" ss:Pattern="Solid"/><Font ss:Color="#00e5a0" ss:Bold="1"/></Style></Styles>
+<Worksheet ss:Name="Logged Trades"><Table>
+<Row>${headers.map(h=>`<Cell ss:StyleID="h"><Data ss:Type="String">${h}</Data></Cell>`).join("")}</Row>
+${rows.map(row=>`<Row>${row.map(v=>`<Cell><Data ss:Type="${isNaN(v)||v===""?"String":"Number"}">${String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;")}</Data></Cell>`).join("")}</Row>`).join("\n")}
+</Table></Worksheet></Workbook>`;
+
+  const blob = new Blob([xml],{type:"application/vnd.ms-excel"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download="logged-trades.xls"; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportPDF(trades, balance) {
+  const {totalPnl, winRate, pf, avgR, total} = (() => {
+    const c=trades.map(t=>({...t,...calc(t)}));
+    const wins=c.filter(t=>t.pnl>0), losses=c.filter(t=>t.pnl<0);
+    const totalPnl=c.reduce((s,t)=>s+t.pnl,0);
+    const winRate=c.length?(wins.length/c.length)*100:0;
+    const avgWin=wins.length?wins.reduce((s,t)=>s+t.pnl,0)/wins.length:0;
+    const avgLoss=losses.length?losses.reduce((s,t)=>s+t.pnl,0)/losses.length:0;
+    const pf=Math.abs(avgLoss)>0?avgWin/Math.abs(avgLoss):0;
+    const rT=c.filter(t=>t.r!==null);
+    const avgR=rT.length?rT.reduce((s,t)=>s+t.r,0)/rT.length:0;
+    return{totalPnl,winRate,wins:wins.length,losses:losses.length,total:c.length,avgWin,avgLoss,pf,avgR};
+  })();
+
+  const fmtN = n=>`${n>=0?"+":"-"}$${Math.abs(n).toFixed(2)}`;
+  const rows = trades.map(t=>{
+    const {pnl,ticks,r} = calc(t);
+    const tp1 = t.tps?.[0]?.price||t.exit||"";
+    return `<tr style="border-bottom:1px solid #1a2030;">
+      <td>${t.date}</td><td>${t.instrument}</td>
+      <td style="color:${t.direction==="Long"?"#00e5a0":"#ff4d6d"}">${t.direction==="Long"?"▲":"▼"} ${t.direction}</td>
+      <td>${t.contracts}</td><td>${t.entry}</td><td>${tp1}</td><td>${t.stop||"—"}</td>
+      <td style="color:${ticks>=0?"#00e5a0":"#ff4d6d"}">${ticks>=0?"+":""}${ticks}</td>
+      <td style="color:${pnl>=0?"#00e5a0":"#ff4d6d"};font-weight:600">${fmtN(pnl)}</td>
+      <td style="color:${(r||0)>=0?"#00e5a060":"#ff4d6d60"}">${r!==null?`${r>=0?"+":""}${r}R`:"—"}</td>
+      <td><span style="background:${t.outcome==="SL"?"#ff4d6d20":t.outcome==="BE"?"#71809620":"#00e5a020"};color:${t.outcome==="SL"?"#ff4d6d":t.outcome==="BE"?"var(--text3)":"#00e5a0"};padding:2px 6px;border-radius:4px;font-size:10px">${t.outcome||"TP"}</span></td>
+      <td>${t.strategy}</td><td>${t.session}</td>
+    </tr>`;
+  }).join("");
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+  <title>Logged — Trade Report</title>
+  <style>
+    body{font-family:'Courier New',monospace;background:#0a0c10;color:#e2e8f0;padding:32px;margin:0;}
+    h1{font-size:28px;font-weight:900;letter-spacing:-0.02em;margin-bottom:4px;}
+    .sub{font-size:11px;letter-spacing:0.2em;color:#4a5568;text-transform:uppercase;margin-bottom:32px;}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;}
+    .stat{background:#0f1318;border:1px solid #1a2030;border-radius:8px;padding:14px;}
+    .stat-l{font-size:8px;letter-spacing:0.15em;color:#4a5568;text-transform:uppercase;margin-bottom:6px;}
+    .stat-v{font-size:20px;font-weight:600;}
+    table{width:100%;border-collapse:collapse;font-size:11px;}
+    th{text-align:left;padding:8px 6px;font-size:8px;letter-spacing:0.15em;text-transform:uppercase;color:#4a5568;border-bottom:1px solid #2d3748;}
+    td{padding:8px 6px;vertical-align:middle;}
+    @media print{body{background:#fff;color:#000;}th{color:#666;}.stat{background:#f5f5f5;border-color:#ddd;}}
+  </style></head><body>
+  <h1>LOGGED</h1><div class="sub">Trade Report · ${new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"})}</div>
+  <div class="stats">
+    <div class="stat"><div class="stat-l">Net P&L</div><div class="stat-v" style="color:${totalPnl>=0?"#00e5a0":"#ff4d6d"}">${fmtN(totalPnl)}</div></div>
+    <div class="stat"><div class="stat-l">Win Rate</div><div class="stat-v">${winRate.toFixed(1)}%</div></div>
+    <div class="stat"><div class="stat-l">Profit Factor</div><div class="stat-v">${pf.toFixed(2)}</div></div>
+    <div class="stat"><div class="stat-l">Avg R</div><div class="stat-v" style="color:${avgR>=0?"#00e5a0":"#ff4d6d"}">${avgR>=0?"+":""}${avgR.toFixed(2)}R</div></div>
+    ${balance>0?`<div class="stat"><div class="stat-l">Total Return</div><div class="stat-v" style="color:${totalPnl>=0?"#00e5a0":"#ff4d6d"}">${totalPnl>=0?"+":""}${((totalPnl/balance)*100).toFixed(2)}%</div></div>`:""}
+    <div class="stat"><div class="stat-l">Total Trades</div><div class="stat-v">${total}</div></div>
+  </div>
+  <table><thead><tr>
+    <th>Date</th><th>Instrument</th><th>Side</th><th>Qty</th><th>Entry</th><th>TP1</th><th>Stop</th><th>Ticks</th><th>P&L</th><th>R</th><th>Outcome</th><th>Strategy</th><th>Session</th>
+  </tr></thead><tbody>${rows}</tbody></table>
+  <script>window.onload=()=>window.print();<\/script></body></html>`;
+
+  const blob = new Blob([html],{type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  window.open(url,"_blank");
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+
+function getStreak(trades) {
+  const sorted = [...trades].sort((a,b)=>b.date.localeCompare(a.date));
+  if(!sorted.length) return {count:0,type:"—"};
+  const first = calc(sorted[0]).pnl;
+  const type = first>=0?"W":"L";
+  let count=0;
+  for(const t of sorted){
+    const p=calc(t).pnl;
+    if((type==="W"&&p>=0)||(type==="L"&&p<0)) count++;
+    else break;
+  }
+  return {count,type};
+}
+
+/* ── Confirm Sheet ── */
+function ConfirmDelete({onConfirm,onCancel}){
+  return(
+    <div className="confirm-overlay" onClick={onCancel}>
+      <div className="confirm-sheet" onClick={e=>e.stopPropagation()}>
+        <div className="confirm-title">Delete this trade?</div>
+        <div className="confirm-sub">This can't be undone.</div>
+        <div className="confirm-btns">
+          <button className="btn-primary" style={{background:"#ff4d6d"}} onClick={onConfirm}>Delete</button>
+          <button className="btn-ghost" style={{textAlign:"center"}} onClick={onCancel}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Lightbox ── */
+function Lightbox({images,start,onClose}){
+  const [i,setI]=useState(start);
+  useEffect(()=>{
+    const h=e=>{if(e.key==="Escape")onClose();if(e.key==="ArrowRight")setI(x=>Math.min(x+1,images.length-1));if(e.key==="ArrowLeft")setI(x=>Math.max(x-1,0));};
+    window.addEventListener("keydown",h);return()=>window.removeEventListener("keydown",h);
+  },[]);
+  return(
+    <div className="lightbox" onClick={onClose}>
+      <button className="lightbox-close" onClick={onClose}>✕</button>
+      <div onClick={e=>e.stopPropagation()}>
+        <img src={images[i].dataUrl} alt={images[i].label||"chart"}/>
+        {images[i].label&&<div style={{textAlign:"center",marginTop:8,fontSize:11,color:"var(--text3)"}}>{images[i].label}</div>}
+        {images.length>1&&<div className="lightbox-nav">
+          <button disabled={i===0} onClick={()=>setI(x=>x-1)}>← Prev</button>
+          <span style={{fontSize:11,color:"var(--text4)"}}>{i+1}/{images.length}</span>
+          <button disabled={i===images.length-1} onClick={()=>setI(x=>x+1)}>Next →</button>
+        </div>}
+      </div>
+    </div>
+  );
+}
+
+/* ── Equity SVG ── */
+function EquityCurve({equity, totalPnl, balance, curr}){
+  if(equity.length<2) return <div style={{color:"var(--text4)",fontSize:12,textAlign:"center",padding:"30px 0"}}>Log more trades to see your curve</div>;
+  const sym = curr?.symbol||"$";
+  const startBal = balance||0;
+  // If balance set, show absolute account value. Otherwise show P&L delta.
+  const vals = startBal>0 ? equity.map(e=>startBal+e.eq) : equity.map(e=>e.eq);
+  const mn=Math.min(...vals, startBal||0);
+  const mx=Math.max(...vals, startBal||0);
+  const rng=mx-mn||1;
+  const W=300,H=80;
+  const pts=vals.map((v,i)=>`${(i/(vals.length-1))*W},${H-((v-mn)/rng)*H}`).join(" ");
+  // baseline = starting balance line if balance set, else zero line
+  const baselineVal = startBal>0 ? startBal : 0;
+  const zy = H-((baselineVal-mn)/rng)*H;
+  const col = totalPnl>=0?"#00e5a0":"#ff4d6d";
+  const fmtV = v => {
+    if(Math.abs(v)>=1000000) return `${sym}${(v/1000000).toFixed(1)}M`;
+    if(Math.abs(v)>=1000) return `${sym}${(v/1000).toFixed(1)}k`;
+    return `${sym}${v.toFixed(0)}`;
+  };
+  return(
+    <div>
+      {/* Y axis labels */}
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+        <span style={{fontSize:9,color:"var(--text4)"}}>{fmtV(mx)}</span>
+        {startBal>0&&<span style={{fontSize:9,color:"var(--text4)"}}>Start: {fmtV(startBal)}</span>}
+        <span style={{fontSize:9,color:"var(--text4)"}}>{fmtV(mn)}</span>
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",height:90,overflow:"visible"}}>
+        {/* Baseline */}
+        <line x1={0} y1={zy} x2={W} y2={zy} stroke="var(--text5)" strokeWidth={0.8} strokeDasharray="3,3"/>
+        {/* Starting balance line */}
+        {startBal>0&&<line x1={0} y1={zy} x2={W} y2={zy} stroke="#718096" strokeWidth={1.5} strokeDasharray="6,3" opacity={0.5}/>}
+        {startBal>0&&<text x={W-4} y={zy-4} fontSize={8} fill="#718096" fillOpacity={0.7} textAnchor="end">Start</text>}
+        {/* Fill area under curve */}
+        <polygon points={`0,${H} ${pts} ${W},${H}`} fill={col} fillOpacity={0.06}/>
+        {/* Curve */}
+        <polyline points={pts} fill="none" stroke={col} strokeWidth={2} strokeLinejoin="round"/>
+        {/* Dots */}
+        {vals.map((v,i)=>(
+          <circle key={i} cx={(i/(vals.length-1))*W} cy={H-((v-mn)/rng)*H} r={2.5} fill={col} opacity={0.6}/>
+        ))}
+        {/* Start and end labels */}
+        <text x={4} y={H-((vals[0]-mn)/rng)*H-6} fontSize={8} fill={col} fillOpacity={0.7}>{fmtV(vals[0])}</text>
+        <text x={W-4} y={H-((vals[vals.length-1]-mn)/rng)*H-6} fontSize={8} fill={col} fillOpacity={0.7} textAnchor="end">{fmtV(vals[vals.length-1])}</text>
+      </svg>
+      {/* Summary row */}
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
+        <div style={{fontSize:10,color:"var(--text4)"}}>
+          {startBal>0?`Start: ${fmtV(startBal)}`:"P&L curve"}
+        </div>
+        <div style={{fontSize:10,color:totalPnl>=0?"#00e5a0":"#ff4d6d",fontWeight:500}}>
+          {totalPnl>=0?"+":""}{sym}{Math.abs(totalPnl).toFixed(2)} ({totalPnl>=0?"+":""}{startBal>0?((totalPnl/startBal)*100).toFixed(2):"—"}%)
+        </div>
+        <div style={{fontSize:10,color:"var(--text4)"}}>
+          {startBal>0?`Now: ${fmtV(startBal+totalPnl)}`:""}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Image Uploader ── */
+function ImageUploader({images,onChange}){
+  const ref=useRef();
+  const [drag,setDrag]=useState(false);
+  const process=files=>{
+    Array.from(files).forEach(f=>{
+      if(!f.type.startsWith("image/"))return;
+      const r=new FileReader();
+      r.onload=e=>onChange(p=>[...p,{id:Date.now()+Math.random(),dataUrl:e.target.result,label:f.name.replace(/\.[^.]+$/,"")}]);
+      r.readAsDataURL(f);
+    });
+  };
+  return(
+    <div>
+      <div className={`upload-zone${drag?" drag":""}`}
+        onClick={()=>ref.current.click()}
+        onDrop={e=>{e.preventDefault();setDrag(false);process(e.dataTransfer.files);}}
+        onDragOver={e=>{e.preventDefault();setDrag(true);}}
+        onDragLeave={()=>setDrag(false)}>
+        <div style={{fontSize:22,marginBottom:4}}>📸</div>
+        <div style={{fontSize:12,color:"var(--text4)"}}>Tap to add chart screenshots</div>
+        <div style={{fontSize:10,color:"var(--text5)",marginTop:3}}>PNG · JPG · WEBP</div>
+        <input ref={ref} type="file" accept="image/*" multiple style={{display:"none"}} onChange={e=>process(e.target.files)}/>
+      </div>
+      {images.length>0&&(
+        <div className="thumb-row">
+          {images.map((img)=>(
+            <div key={img.id} className="thumb-wrap">
+              <img src={img.dataUrl} alt=""/>
+              <button className="thumb-del" onClick={()=>onChange(p=>p.filter(x=>x.id!==img.id))}>×</button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const PROFILE_KEY = "logged_profile_v1";
+
+/* ── Splash Screen ── */
+function SplashScreen({onDone}){
+  const [fading,setFading]=useState(false);
+  useEffect(()=>{
+    const t1=setTimeout(()=>setFading(true),2000);
+    const t2=setTimeout(()=>onDone(),2700);
+    return()=>{clearTimeout(t1);clearTimeout(t2);}
+  },[]);
+  return(
+    <div className={`splash${fading?" fade":""}`}>
+      <div className="splash-logo">
+        <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:52,color:"var(--text)",letterSpacing:"-0.03em",lineHeight:1,textAlign:"center"}}>
+          LOGGED
+        </div>
+      </div>
+      <div className="splash-sub">
+        <div style={{fontSize:10,letterSpacing:"0.3em",color:"var(--text4)",textTransform:"uppercase",textAlign:"center",marginTop:8}}>
+          futures journal
+        </div>
+      </div>
+      <div className="splash-bar-wrap">
+        <div className="splash-bar"/>
+      </div>
+      <div style={{position:"absolute",bottom:48,fontSize:11,letterSpacing:"0.05em",color:"#718096",textAlign:"center",animation:"subIn 0.6s ease 1.2s both",fontStyle:"italic"}}>
+        Logged it. Learned it. Owned it.
+      </div>
+    </div>
+  );
+}
+
+/* ── PIN Screen ── */
+function PinScreen({onUnlock}){
+  const profile = useMemo(()=>{try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"null")}catch{return null}},[]);
+  const isSetup = !profile;
+  const [step, setStep] = useState(isSetup?"name":"pin"); // name | setpin | confirm | pin
+  const [name, setName] = useState("");
+  const [pin, setPin] = useState("");
+  const [confirmPin, setConfirmPin] = useState("");
+  const [entered, setEntered] = useState("");
+  const [error, setError] = useState(false);
+  const [shake, setShake] = useState(false);
+
+  const triggerError = () => {
+    setError(true); setShake(true);
+    setTimeout(()=>{setEntered("");setError(false);setShake(false);},600);
+  };
+
+  const pressDigit = (d) => {
+    if(step==="pin"){
+      const next = entered+d;
+      setEntered(next);
+      if(next.length===4){
+        if(next===profile.pin){ setTimeout(()=>onUnlock(profile.name),150); }
+        else triggerError();
+      }
+    } else if(step==="setpin"){
+      const next = pin+d;
+      setPin(next);
+      if(next.length===4) setStep("confirm");
+    } else if(step==="confirm"){
+      const next = confirmPin+d;
+      setConfirmPin(next);
+      if(next.length===4){
+        if(next===pin){
+          localStorage.setItem(PROFILE_KEY, JSON.stringify({name:name.trim(), pin:next}));
+          setTimeout(()=>onUnlock(name.trim()),150);
+        } else {
+          setConfirmPin(""); setPin(""); setStep("setpin"); triggerError();
+        }
+      }
+    }
+  };
+
+  const pressDelete = () => {
+    if(step==="pin") setEntered(e=>e.slice(0,-1));
+    else if(step==="setpin") setPin(p=>p.slice(0,-1));
+    else if(step==="confirm") setConfirmPin(p=>p.slice(0,-1));
+  };
+
+  const currentEntry = step==="pin"?entered:step==="setpin"?pin:confirmPin;
+
+  const DIGITS = ["1","2","3","4","5","6","7","8","9","#","0","⌫"];
+
+  return(
+    <div className="pin-screen" style={{background:"radial-gradient(ellipse at 0% 0%,#1a0a2e 0%,transparent 60%),radial-gradient(ellipse at 100% 100%,#00251a 0%,transparent 60%),#080b12"}}>
+      <div style={{textAlign:"center",marginBottom:8}}>
+        <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:28,color:"var(--text)",letterSpacing:"-0.02em"}}>LOGGED</div>
+        <div style={{fontSize:9,letterSpacing:"0.25em",color:"var(--text4)",textTransform:"uppercase",marginTop:2}}>futures journal</div>
+        <div style={{fontSize:10,color:"#4a5568",marginTop:6,fontStyle:"italic",letterSpacing:"0.02em"}}>Logged it. Learned it. Owned it.</div>
+      </div>
+
+      {step==="name"&&(
+        <div style={{width:"100%",maxWidth:280,marginTop:32}}>
+          <div style={{fontSize:13,color:"var(--text3)",textAlign:"center",marginBottom:20,lineHeight:1.6}}>What's your name?</div>
+          <input className="pin-name-input" placeholder="Your name..." value={name} onChange={e=>setName(e.target.value)} autoFocus/>
+          <button className="btn-primary" style={{marginTop:16}} disabled={!name.trim()}
+            onClick={()=>setStep("setpin")}>
+            Continue →
+          </button>
+        </div>
+      )}
+
+      {(step==="setpin"||step==="confirm"||step==="pin")&&(
+        <>
+          <div style={{fontSize:13,color:"var(--text3)",textAlign:"center",marginTop:24,lineHeight:1.6}}>
+            {step==="pin"&&<><span style={{color:"var(--text2)",fontWeight:500}}>{profile.name}</span><br/>Enter your PIN</>}
+            {step==="setpin"&&<>Set a 4-digit PIN</>}
+            {step==="confirm"&&<>Confirm your PIN</>}
+          </div>
+
+          <div className="pin-dots" style={{animation:shake?"shake 0.3s ease":undefined}}>
+            {[0,1,2,3].map(i=>(
+              <div key={i} className={`pin-dot${currentEntry.length>i?" filled":""}${error?" error":""}`}/>
+            ))}
+          </div>
+
+          <div className="pin-pad">
+            {DIGITS.map((d,i)=>(
+              d==="#"?(
+                <button key={i} className="pin-btn del" style={{color:"var(--text5)",cursor:"default"}} onClick={()=>{}}>#</button>
+              ):d==="⌫"?(
+                <button key={i} className="pin-btn del" onClick={pressDelete}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" y1="9" x2="12" y2="15"/><line x1="12" y1="9" x2="18" y2="15"/>
+                  </svg>
+                </button>
+              ):(
+                <button key={i} className="pin-btn" onClick={()=>pressDigit(d)}>{d}</button>
+              )
+            ))}
+          </div>
+        </>
+      )}
+
+      <style>{`
+        @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+      `}</style>
+    </div>
+  );
+}
+
+/* ── Add Level Row ── */
+/* ── Calendar View ── */
+function CalendarView({trades, fmt, calc, curr}){
+  const today = new Date();
+  const [calYear, setCalYear] = useState(today.getFullYear());
+  const [calMonth, setCalMonth] = useState(today.getMonth());
+  const [selectedDay, setSelectedDay] = useState(null);
+
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  // Build day map for current month
+  const dayMap = useMemo(()=>{
+    const map = {};
+    trades.forEach(t=>{
+      const d = new Date(t.date);
+      if(d.getFullYear()===calYear && d.getMonth()===calMonth){
+        const key = t.date;
+        if(!map[key]) map[key]={pnl:0,count:0,trades:[]};
+        map[key].pnl += calc(t).pnl;
+        map[key].count++;
+        map[key].trades.push(t);
+      }
+    });
+    return map;
+  },[trades, calYear, calMonth]);
+
+  // Monthly summary
+  const monthPnl = Object.values(dayMap).reduce((s,d)=>s+d.pnl,0);
+  const greenDays = Object.values(dayMap).filter(d=>d.pnl>0).length;
+  const redDays = Object.values(dayMap).filter(d=>d.pnl<0).length;
+
+  // Build calendar grid
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const cells = [];
+  for(let i=0;i<firstDay;i++) cells.push(null);
+  for(let d=1;d<=daysInMonth;d++) cells.push(d);
+
+  const prevMonth = ()=>{ if(calMonth===0){setCalMonth(11);setCalYear(y=>y-1);}else setCalMonth(m=>m-1); setSelectedDay(null); };
+  const nextMonth = ()=>{ if(calMonth===11){setCalMonth(0);setCalYear(y=>y+1);}else setCalMonth(m=>m+1); setSelectedDay(null); };
+
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+
+  const selKey = selectedDay ? `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(selectedDay).padStart(2,"0")}` : null;
+  const selData = selKey ? dayMap[selKey] : null;
+
+  return(
+    <>
+      {/* Month header */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+        <button onClick={prevMonth} style={{background:"none",border:"none",color:"var(--text3)",fontSize:20,cursor:"pointer",padding:"4px 8px"}}>‹</button>
+        <div style={{textAlign:"center"}}>
+          <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:20,color:"var(--text)"}}>{MONTHS[calMonth]}</div>
+          <div style={{fontSize:11,color:"var(--text4)"}}>{calYear}</div>
+        </div>
+        <button onClick={nextMonth} style={{background:"none",border:"none",color:"var(--text3)",fontSize:20,cursor:"pointer",padding:"4px 8px"}}>›</button>
+      </div>
+
+      {/* Monthly summary */}
+      <div style={{display:"flex",gap:8,marginBottom:16}}>
+        {[
+          {l:"Month P&L",v:fmt(monthPnl),c:monthPnl>=0?"#00e5a0":"#ff4d6d"},
+          {l:"Green Days",v:greenDays,c:"#00e5a0"},
+          {l:"Red Days",v:redDays,c:"#ff4d6d"},
+        ].map(s=>(
+          <div key={s.l} className="stat-card" style={{flex:1,padding:"10px 12px"}}>
+            <div className="stat-label">{s.l}</div>
+            <div style={{fontSize:16,fontWeight:500,color:s.c}}>{s.v}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Day headers */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:4}}>
+        {DAYS.map(d=>(
+          <div key={d} style={{textAlign:"center",fontSize:9,letterSpacing:"0.1em",color:"var(--text4)",textTransform:"uppercase",padding:"4px 0"}}>{d}</div>
+        ))}
+      </div>
+
+      {/* Calendar grid */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:16}}>
+        {cells.map((day,i)=>{
+          if(!day) return <div key={`e${i}`}/>;
+          const key = `${calYear}-${String(calMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+          const data = dayMap[key];
+          const isToday = key===todayStr;
+          const isSelected = day===selectedDay;
+          const bg = data ? (data.pnl>0?"#00e5a0":"#ff4d6d") : "transparent";
+          const intensity = data ? Math.min(0.7, 0.15 + Math.abs(data.pnl)/500*0.4) : 0;
+          return(
+            <div key={day} onClick={()=>setSelectedDay(day===selectedDay?null:day)}
+              style={{aspectRatio:"1",borderRadius:8,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:data?"pointer":"default",
+                background:data?`${bg}${Math.round(intensity*255).toString(16).padStart(2,"0")}`:"var(--surface2)",
+                border:isSelected?`2px solid ${data?bg:"var(--accent)"}`:`2px solid ${isToday?"var(--accent)":"transparent"}`,
+                transition:"all 0.15s",position:"relative"}}>
+              <div style={{fontSize:12,fontWeight:isToday?700:400,color:data?(data.pnl>0?"#00e5a0":"#ff4d6d"):"var(--text4)"}}>{day}</div>
+              {data&&<div style={{fontSize:7,color:data.pnl>0?"#00e5a080":"#ff4d6d80",letterSpacing:"-0.02em"}}>{data.count}t</div>}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Selected day detail */}
+      {selectedDay&&(
+        <div className="stat-card">
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+            <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:16,color:"var(--text)"}}>{MONTHS[calMonth]} {selectedDay}</div>
+            {selData&&<div style={{fontSize:18,fontWeight:500,color:selData.pnl>=0?"#00e5a0":"#ff4d6d"}}>{fmt(selData.pnl)}</div>}
+          </div>
+          {!selData?(
+            <div style={{fontSize:12,color:"var(--text4)",textAlign:"center",padding:"16px 0"}}>No trades on this day</div>
+          ):(
+            selData.trades.map(t=>{
+              const {pnl,ticks,r}=calc(t);
+              return(
+                <div key={t.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 0",borderBottom:"1px solid var(--border)"}}>
+                  <div>
+                    <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:3}}>
+                      <span style={{fontSize:13,fontWeight:500,color:"var(--text)"}}>{t.instrument}</span>
+                      <span style={{fontSize:11,color:t.direction==="Long"?"#00e5a0":"#ff4d6d"}}>{t.direction==="Long"?"▲":"▼"} {t.direction}</span>
+                      {t.emotion&&<span style={{fontSize:11}}>{t.emotion.split(" ")[0]}</span>}
+                    </div>
+                    <div style={{display:"flex",gap:8}}>
+                      <span className="tag">{t.strategy}</span>
+                      <span className="tag">{t.outcome||"TP"}</span>
+                    </div>
+                  </div>
+                  <div style={{textAlign:"right"}}>
+                    <div style={{fontSize:15,fontWeight:500,color:pnl>=0?"#00e5a0":"#ff4d6d"}}>{fmt(pnl)}</div>
+                    <div style={{fontSize:11,color:"var(--text4)"}}>{ticks>=0?"+":""}{ticks} ticks{r!==null?` · ${r>=0?"+":""}${r}R`:""}</div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* Goals shortcut */}
+    </>
+  );
+}
+
+/* ── Goals View ── */
+function GoalsView({trades, goals, setGoals, fmt, calc, goalColour}){
+  const [showAddGoal, setShowAddGoal] = useState(false);
+  const [editGroupId, setEditGroupId] = useState(null);
+  const [groupForm, setGroupForm] = useState({title:"", period:"Daily", targets:[]});
+  const [newTarget, setNewTarget] = useState({type:"PnL", amount:""});
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay());
+  const todayStr = now.toISOString().split("T")[0];
+
+  const getPeriodTrades = (period) => trades.filter(t=>{
+    const d = new Date(t.date);
+    if(period==="Daily") return t.date===todayStr;
+    if(period==="Weekly") return d>=weekStart;
+    if(period==="Monthly") return d>=monthStart;
+    return true;
+  });
+
+  const getProgress = (type, period) => {
+    const pt = getPeriodTrades(period);
+    switch(type){
+      case "PnL": return pt.reduce((s,t)=>s+calc(t).pnl,0);
+      case "WinRate": { const w=pt.filter(t=>calc(t).pnl>0).length; return pt.length?Math.round(w/pt.length*100):0; }
+      case "Trades": return pt.length;
+      case "AvgR": { const rt=pt.filter(t=>calc(t).r!==null); return rt.length?Math.round(rt.reduce((s,t)=>s+calc(t).r,0)/rt.length*100)/100:0; }
+      case "MaxLoss": return Math.abs(Math.min(...pt.map(t=>calc(t).pnl),0));
+      default: return 0;
+    }
+  };
+
+  const TYPES = [
+    {k:"PnL",l:"Net P&L",unit:"$"},
+    {k:"WinRate",l:"Win Rate",unit:"%"},
+    {k:"Trades",l:"No. of Trades",unit:""},
+    {k:"AvgR",l:"Avg R",unit:"R"},
+    {k:"MaxLoss",l:"Max Loss",unit:"$"},
+  ];
+
+  const fmtVal = (type, val) => {
+    switch(type){
+      case "PnL": return fmt(val);
+      case "WinRate": return `${val}%`;
+      case "Trades": return `${val}`;
+      case "AvgR": return `${val>=0?"+":""}${val}R`;
+      case "MaxLoss": return `$${Math.abs(val).toFixed(0)}`;
+      default: return val;
+    }
+  };
+
+  const fmtTarget = (type, amt) => {
+    switch(type){
+      case "PnL": case "MaxLoss": return `$${amt}`;
+      case "WinRate": return `${amt}%`;
+      case "AvgR": return `${amt}R`;
+      default: return `${amt}`;
+    }
+  };
+
+  const getColor = (type, pct, progress) => {
+    if(type==="MaxLoss") return pct<=100?"#00e5a0":"#ff4d6d";
+    if(type==="PnL") return progress>=0?"#00e5a0":"#ff4d6d";
+    // simple = just green/red, traffic = green/amber/red
+    if(goalColour==="traffic"){
+      return pct>=100?"#00e5a0":pct>=60?"#f6ad55":"#ff4d6d";
+    }
+    return pct>=100?"#00e5a0":"#ff4d6d";
+  };
+
+  const openNew = () => {
+    setGroupForm({title:"", period:"Daily", targets:[]});
+    setNewTarget({type:"PnL", amount:""});
+    setEditGroupId(null);
+    setShowAddGoal(true);
+  };
+
+  const addTargetToForm = () => {
+    if(!newTarget.amount||isNaN(parseFloat(newTarget.amount))) return;
+    setGroupForm(f=>({...f, targets:[...f.targets, {...newTarget, amount:parseFloat(newTarget.amount), id:Date.now()}]}));
+    setNewTarget({type:"PnL", amount:""});
+  };
+
+  const saveGroup = () => {
+    if(!groupForm.title||!groupForm.targets.length) return;
+    if(editGroupId){
+      setGoals(g=>g.map(gi=>gi.id===editGroupId?{...groupForm,id:editGroupId}:gi));
+    } else {
+      setGoals(g=>[...g,{...groupForm,id:Date.now()}]);
+    }
+    setShowAddGoal(false);
+  };
+
+  return(
+    <>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+        <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:20,color:"var(--text)"}}>Goals</div>
+        <button className="btn-primary" style={{width:"auto",padding:"8px 16px",fontSize:11}} onClick={openNew}>+ Add Group</button>
+      </div>
+
+      {goals.length===0?(
+        <div className="empty">
+          <div className="empty-icon">🎯</div>
+          <div style={{fontFamily:"'Syne',sans-serif",fontSize:20,color:"var(--text4)",marginBottom:8}}>No goals yet</div>
+          <div style={{fontSize:12,color:"var(--text5)",marginBottom:24}}>Create a goal group to track multiple targets</div>
+          <button className="btn-primary" style={{width:"auto",padding:"12px 28px"}} onClick={openNew}>+ Create Goal Group</button>
+        </div>
+      ):(
+        goals.map(group=>{
+          const allDone = (group.targets||[]).every(t=>{
+            const progress = getProgress(t.type, group.period);
+            const pct = Math.round(Math.abs(progress)/t.amount*100);
+            return t.type==="MaxLoss"?pct<=100:pct>=100;
+          });
+          return(
+            <div key={group.id} className="stat-card" style={{marginBottom:12}}>
+              {/* Group header */}
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
+                <div>
+                  <div style={{fontSize:15,color:"var(--text)",fontWeight:500,marginBottom:4}}>{group.title}</div>
+                  <div style={{display:"flex",gap:6}}>
+                    <span className="tag">{group.period}</span>
+                    <span className="tag">{group.targets.length} target{group.targets.length!==1?"s":""}</span>
+                    {allDone&&<span style={{fontSize:9,padding:"2px 8px",borderRadius:4,background:"var(--accent-bg)",color:"var(--accent)",letterSpacing:"0.08em"}}>✓ ALL MET</span>}
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:6}}>
+                  <button className="btn-ghost" style={{padding:"4px 10px",fontSize:10}} onClick={()=>{setGroupForm({...group});setEditGroupId(group.id);setNewTarget({type:"PnL",amount:""});setShowAddGoal(true);}}>Edit</button>
+                  <button onClick={()=>setGoals(g=>g.filter(gi=>gi.id!==group.id))} style={{background:"none",border:"none",color:"var(--text5)",cursor:"pointer",fontSize:18,padding:"2px 4px"}} onMouseEnter={e=>e.target.style.color="#ff4d6d"} onMouseLeave={e=>e.target.style.color="var(--text5)"}>×</button>
+                </div>
+              </div>
+              {/* Individual targets */}
+              {(group.targets||[]).map((target,i)=>{
+                const progress = getProgress(target.type, group.period);
+                const rawPct = Math.round(Math.abs(progress)/target.amount*100);
+                const pct = Math.min(rawPct, 100);
+                const col = getColor(target.type, rawPct, progress);
+                const typeInfo = TYPES.find(t=>t.k===target.type);
+                return(
+                  <div key={target.id||i} style={{marginBottom:i<group.targets.length-1?14:0}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5}}>
+                      <span style={{fontSize:11,color:"var(--text3)"}}>{typeInfo?.l}</span>
+                      <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                        <span style={{fontSize:11,color:col}}>{fmtVal(target.type,progress)}</span>
+                        <span style={{fontSize:10,color:"var(--text4)"}}>/ {fmtTarget(target.type,target.amount)}</span>
+                        <span style={{fontSize:11,fontWeight:500,color:col}}>{rawPct}%</span>
+                      </div>
+                    </div>
+                    <div style={{height:5,background:"var(--tag-bg)",borderRadius:3,overflow:"hidden"}}>
+                      <div style={{height:"100%",width:`${pct}%`,background:col,borderRadius:3,transition:"width 0.5s"}}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })
+      )}
+
+      {/* Add/Edit Group Sheet */}
+      {showAddGoal&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.8)",zIndex:200,display:"flex",alignItems:"flex-end"}} onMouseDown={e=>{if(e.target===e.currentTarget)setShowAddGoal(false);}}>
+          <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:"16px 16px 0 0",padding:"20px",width:"100%",paddingBottom:`calc(100px + env(safe-area-inset-bottom))`,maxHeight:"90vh",overflowY:"auto"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18}}>
+              <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:16,color:"var(--text)"}}>{editGroupId?"Edit Goal Group":"New Goal Group"}</div>
+              <button onClick={()=>setShowAddGoal(false)} style={{background:"none",border:"none",color:"var(--text3)",fontSize:18,cursor:"pointer"}}>✕</button>
+            </div>
+
+            {/* Title */}
+            <div className="field-group">
+              <label className="field-label">Group Title</label>
+              <input className="field-input" placeholder="e.g. Daily Targets" value={groupForm.title}
+                onChange={e=>setGroupForm(f=>({...f,title:e.target.value}))}/>
+            </div>
+
+            {/* Period */}
+            <div className="field-group">
+              <label className="field-label">Period</label>
+              <div style={{display:"flex",gap:8}}>
+                {["Daily","Weekly","Monthly","All Time"].map(p=>(
+                  <button key={p} onClick={()=>setGroupForm(f=>({...f,period:p}))}
+                    style={{flex:1,padding:"10px 4px",border:`1px solid ${groupForm.period===p?"#00e5a040":"#1e2530"}`,borderRadius:8,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",
+                      background:groupForm.period===p?"var(--accent-bg)":"var(--surface2)",
+                      color:groupForm.period===p?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>{p}</button>
+                ))}
+              </div>
+            </div>
+
+            {/* Existing targets */}
+            {groupForm.targets.length>0&&(
+              <div className="field-group">
+                <label className="field-label">Targets ({groupForm.targets.length})</label>
+                {groupForm.targets.map((t,i)=>(
+                  <div key={t.id||i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:8,marginBottom:6}}>
+                    <span style={{flex:1,fontSize:12,color:"var(--text2)"}}>{TYPES.find(tp=>tp.k===t.type)?.l}</span>
+                    <span style={{fontSize:13,color:"#00e5a0",fontWeight:500}}>{fmtTarget(t.type,t.amount)}</span>
+                    <button onClick={()=>setGroupForm(f=>({...f,targets:f.targets.filter((_,j)=>j!==i)}))}
+                      style={{background:"none",border:"none",color:"var(--text5)",cursor:"pointer",fontSize:16,padding:"0 2px"}}
+                      onMouseEnter={e=>e.target.style.color="#ff4d6d"} onMouseLeave={e=>e.target.style.color="var(--text5)"}>×</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add new target */}
+            <div className="field-group">
+              <label className="field-label">Add Target</label>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+                {TYPES.map(o=>(
+                  <button key={o.k} onClick={()=>setNewTarget(f=>({...f,type:o.k}))}
+                    style={{padding:"10px",border:`1px solid ${newTarget.type===o.k?"#00e5a040":"#1e2530"}`,borderRadius:8,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",
+                      background:newTarget.type===o.k?"#00e5a015":"#111418",
+                      color:newTarget.type===o.k?"var(--accent)":"var(--text4)",transition:"all 0.15s",textAlign:"left"}}>{o.l} ({o.unit||"#"})</button>
+                ))}
+              </div>
+              <div style={{display:"flex",gap:8}}>
+                <input type="number" inputMode="decimal" placeholder="Amount" className="field-input" style={{flex:1}}
+                  value={newTarget.amount} onChange={e=>setNewTarget(f=>({...f,amount:e.target.value}))}/>
+                <button className="btn-primary" style={{width:"auto",padding:"0 16px",fontSize:11,flexShrink:0}}
+                  onClick={(e)=>{e.stopPropagation();addTargetToForm();}}>+ Add</button>
+              </div>
+            </div>
+
+            <button className="btn-primary" style={{marginTop:4}} onClick={(e)=>{e.stopPropagation();saveGroup();}}>
+              {editGroupId?"Update Group":"Save Goal Group"}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ── Edit Name Row ── */
+/* ── Export Section ── */
+function ExportSection({trades, balance, curr, stats}){
+  const [range, setRange] = useState("All");
+
+  const filterTrades = () => {
+    const now = new Date();
+    const today = now.toISOString().split("T")[0];
+    const week = new Date(now); week.setDate(now.getDate()-7);
+    const month = new Date(now); month.setMonth(now.getMonth()-1);
+    switch(range){
+      case "1 Day": return trades.filter(t=>t.date===today);
+      case "1 Week": return trades.filter(t=>new Date(t.date)>=week);
+      case "1 Month": return trades.filter(t=>new Date(t.date)>=month);
+      default: return trades;
+    }
+  };
+
+  const filtered = filterTrades();
+
+  return(
+    <>
+      {/* Range selector */}
+      <div style={{display:"flex",gap:8,marginBottom:14}}>
+        {["1 Day","1 Week","1 Month","All"].map(r=>(
+          <button key={r} onClick={()=>setRange(r)} style={{flex:1,padding:"8px 4px",border:`1px solid ${range===r?"var(--accent)":"var(--border2)"}`,borderRadius:8,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",background:range===r?"var(--accent-bg)":"var(--surface2)",color:range===r?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>{r}</button>
+        ))}
+      </div>
+
+      {/* Trade count for selected range */}
+      <div style={{fontSize:11,color:"var(--text4)",marginBottom:14,textAlign:"center"}}>
+        <span style={{color:"var(--text2)",fontWeight:500}}>{filtered.length}</span> trades in range
+        {filtered.length>0&&<span style={{marginLeft:8,color:filtered.reduce((s,t)=>s+calc(t).pnl,0)>=0?"#00e5a0":"#ff4d6d"}}>
+          · {filtered.reduce((s,t)=>s+calc(t).pnl,0)>=0?"+":""}{curr.symbol}{Math.abs(filtered.reduce((s,t)=>s+calc(t).pnl,0)).toFixed(2)}
+        </span>}
+      </div>
+
+      {/* Export buttons */}
+      <div style={{display:"flex",gap:10}}>
+        <button onClick={()=>exportExcel(filtered)} disabled={!filtered.length}
+          style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:8,padding:"11px",color:filtered.length?"var(--text2)":"var(--text5)",fontFamily:"'DM Mono',monospace",fontSize:12,cursor:filtered.length?"pointer":"default",opacity:filtered.length?1:0.4,transition:"all 0.15s"}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/></svg>
+          Excel
+        </button>
+        <button onClick={()=>exportPDF(filtered,balance)} disabled={!filtered.length}
+          style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"var(--surface2)",border:"1px solid var(--border2)",borderRadius:8,padding:"11px",color:filtered.length?"var(--text2)":"var(--text5)",fontFamily:"'DM Mono',monospace",fontSize:12,cursor:filtered.length?"pointer":"default",opacity:filtered.length?1:0.4,transition:"all 0.15s"}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="12" y2="17"/></svg>
+          PDF
+        </button>
+      </div>
+    </>
+  );
+}
+
+function EditNameRow({traderName, onSave}){
+  const [editing, setEditing] = useState(false);
+  const [input, setInput] = useState("");
+  if(!editing) return(
+    <button onClick={()=>{setInput(traderName);setEditing(true);}} style={{background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"6px 14px",color:"var(--text4)",fontSize:11,fontFamily:"'DM Mono',monospace",cursor:"pointer",letterSpacing:"0.05em"}}>Edit Name</button>
+  );
+  return(
+    <div style={{display:"flex",gap:8}}>
+      <input className="field-input" placeholder="Enter new name..." value={input} onChange={e=>setInput(e.target.value)}
+        onKeyDown={e=>{if(e.key==="Enter"&&input.trim()){onSave(input.trim());setEditing(false);}}}
+        style={{flex:1,fontSize:15,padding:"10px 12px"}} autoFocus/>
+      <button className="btn-primary" style={{width:"auto",padding:"0 14px",fontSize:11,flexShrink:0}}
+        onClick={()=>{if(input.trim()){onSave(input.trim());setEditing(false);}}}>Save</button>
+      <button className="btn-ghost" onClick={()=>setEditing(false)}>✕</button>
+    </div>
+  );
+}
+
+function BalanceCard({balance, setBalance, stats, currency, setCurrency, curr}){
+  const [editingBal, setEditingBal] = useState(false);
+  const [balInput, setBalInput] = useState("");
+  const sym = curr?.symbol||"$";
+  const loc = curr?.locale||"en-US";
+  const fmtBal = n=>`${sym}${n.toLocaleString(loc,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  return(
+    <div className="stat-card" style={{marginBottom:12}}>
+      <div className="stat-label" style={{marginBottom:10}}>Account Balance</div>
+
+      {/* Currency selector */}
+      <div style={{display:"flex",gap:8,marginBottom:14}}>
+        {CURRENCIES.map(c=>(
+          <button key={c.code} onClick={()=>setCurrency(c.code)} style={{flex:1,padding:"8px",border:`1px solid ${currency===c.code?"var(--accent)":"var(--border2)"}`,borderRadius:8,cursor:"pointer",fontSize:13,fontFamily:"'DM Mono',monospace",background:currency===c.code?"var(--accent-bg)":"var(--surface2)",color:currency===c.code?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>
+            {c.symbol} {c.code}
+          </button>
+        ))}
+      </div>
+
+      {balance>0&&!editingBal?(
+        <div>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:12}}>
+            <div>
+              <div style={{fontSize:10,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>Starting</div>
+              <div style={{fontSize:18,color:"var(--text2)"}}>{fmtBal(balance)}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:10,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>Current</div>
+              <div style={{fontSize:18,color:stats.totalPnl>=0?"#00e5a0":"#ff4d6d"}}>{fmtBal(balance+stats.totalPnl)}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              <div style={{fontSize:10,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:3}}>Return</div>
+              <div style={{fontSize:18,color:stats.totalPnl>=0?"#00e5a0":"#ff4d6d"}}>{stats.totalPnl>=0?"+":""}{((stats.totalPnl/balance)*100).toFixed(2)}%</div>
+            </div>
+          </div>
+          <div style={{height:4,background:"var(--tag-bg)",borderRadius:2,overflow:"hidden",marginBottom:10}}>
+            <div style={{height:"100%",width:`${Math.min(100,Math.max(0,(balance+stats.totalPnl)/balance*100))}%`,background:stats.totalPnl>=0?"#00e5a0":"#ff4d6d",borderRadius:2,transition:"width 0.5s"}}/>
+          </div>
+          <button onClick={()=>{setBalInput(balance.toString());setEditingBal(true);}} style={{background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"5px 12px",color:"var(--text4)",fontSize:10,fontFamily:"'DM Mono',monospace",cursor:"pointer",letterSpacing:"0.05em"}}>Edit Balance</button>
+        </div>
+      ):(
+        <div>
+          {!editingBal&&<div style={{fontSize:12,color:"var(--text4)",marginBottom:12}}>Enter your starting balance to track % returns and risk per trade.</div>}
+          <div style={{display:"flex",gap:8}}>
+            <input type="number" inputMode="decimal" placeholder={`e.g. 10000`} className="field-input" style={{flex:1}}
+              value={balInput} onChange={e=>setBalInput(e.target.value)}/>
+            <button className="btn-primary" style={{width:"auto",padding:"0 16px",fontSize:11}}
+              onClick={()=>{const v=parseFloat(balInput);if(!isNaN(v)&&v>0){setBalance(v);setEditingBal(false);}}}>Save</button>
+            {editingBal&&<button className="btn-ghost" onClick={()=>setEditingBal(false)}>✕</button>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+function App(){
+  const [showSplash, setShowSplash] = useState(true);
+  const [unlocked, setUnlocked] = useState(false);
+  const [traderName, setTraderName] = useState("");
+  const [balance, setBalance] = useState(()=>{try{return parseFloat(localStorage.getItem(BALANCE_KEY)||"0")||0}catch{return 0}});
+  const [currency, setCurrency] = useState(()=>{try{return localStorage.getItem(CURRENCY_KEY)||"USD"}catch{return "USD"}});
+  const [theme, setTheme] = useState(()=>{try{return localStorage.getItem(THEME_KEY)||"dark"}catch{return "dark"}});
+  const [goalColour, setGoalColour] = useState(()=>{try{return localStorage.getItem(GOAL_COLOUR_KEY)||"simple"}catch{return "simple"}});
+  const [trades,setTrades]=useState(()=>{
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return [];
+      const saved = JSON.parse(raw);
+      if(!Array.isArray(saved)) return [];
+      return saved.map(t=>({...t, tps: (t.tps&&t.tps.length>0) ? t.tps : t.exit ? [{price:t.exit, contracts:t.contracts}] : [{price:"",contracts:""}]}));
+    }catch(e){console.error("Trade load error:",e);return[]}
+  });
+  const [view,setView]=useState("journal");
+  const [form,setForm]=useState(blankForm());
+  const [editId,setEditId]=useState(null);
+  const [expanded,setExpanded]=useState(null);
+  const [lightbox,setLightbox]=useState(null);
+  const [confirmDel,setConfirmDel]=useState(null); // trade id to delete
+  const [showInstall,setShowInstall]=useState(false);
+  const [deferredPrompt,setDeferredPrompt]=useState(null);
+
+  useEffect(()=>{localStorage.setItem(STORAGE_KEY,JSON.stringify(trades));},[trades]);
+  useEffect(()=>{if(balance>0)localStorage.setItem(BALANCE_KEY,balance.toString());},[balance]);
+  useEffect(()=>{localStorage.setItem(CURRENCY_KEY,currency);},[currency]);
+  useEffect(()=>{localStorage.setItem(THEME_KEY,theme);},[theme]);
+  useEffect(()=>{localStorage.setItem(GOAL_COLOUR_KEY,goalColour);},[goalColour]);
+
+  useEffect(()=>{
+    const handler=e=>{e.preventDefault();setDeferredPrompt(e);setShowInstall(true);};
+    window.addEventListener("beforeinstallprompt",handler);
+    if(navigator.standalone===false&&/iPhone|iPad|iPod/.test(navigator.userAgent)) setShowInstall(true);
+    return()=>window.removeEventListener("beforeinstallprompt",handler);
+  },[]);
+
+  const setF=k=>e=>setForm(f=>({...f,[k]:e.target.value}));
+  const setFv=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  const submit=()=>{
+    const outcome = form.outcome||"TP";
+    const filledTps=(form.tps||[]).filter(tp=>tp.price);
+    // SL and BE don't need a TP price
+    if(!form.entry) return;
+    if((outcome==="TP"||outcome==="Partial")&&!filledTps.length) return;
+    const normalisedTps = filledTps.map(tp=>({...tp, contracts: tp.contracts||form.contracts}));
+    const tradeToSave = {...form, outcome, tps: normalisedTps};
+    if(editId!==null){
+      setTrades(t=>t.map(tr=>tr.id===editId?{...tradeToSave,id:editId}:tr));
+      setEditId(null);
+    } else {
+      setTrades(t=>[...t,{...tradeToSave,id:Date.now()}]);
+    }
+    setForm(blankForm());
+    setView("journal");
+  };
+
+  const confirmDelete=(id)=>setConfirmDel(id);
+  const doDelete=()=>{
+    setTrades(t=>t.filter(tr=>tr.id!==confirmDel));
+    if(expanded===confirmDel)setExpanded(null);
+    setConfirmDel(null);
+  };
+
+  const edit=trade=>{
+    const tps = (trade.tps&&trade.tps.length>0) ? trade.tps : trade.exit ? [{price:trade.exit,contracts:trade.contracts}] : [{price:"",contracts:""}];
+    setForm({...blankForm(),...trade,images:trade.images||[],tps});
+    setEditId(trade.id);setView("add");
+  };
+
+  // Group trades by date
+  const groupedTrades = useMemo(()=>{
+    if(!trades||!trades.length) return [];
+    let filtered = [...trades];
+
+    // Only filter if explicitly set
+    if(filterOutcome&&filterOutcome!=="All"){
+      filtered = filtered.filter(t=>{
+        const o = t.outcome||"TP";
+        return o===filterOutcome;
+      });
+    }
+    if(filterInstrument&&filterInstrument!=="All"){
+      filtered = filtered.filter(t=>t.instrument===filterInstrument);
+    }
+    const q = (searchQuery||"").trim().toLowerCase();
+    if(q){
+      filtered = filtered.filter(t=>
+        (t.notes||"").toLowerCase().includes(q)||
+        (t.instrument||"").toLowerCase().includes(q)||
+        (t.strategy||"").toLowerCase().includes(q)||
+        (t.session||"").toLowerCase().includes(q)||
+        (t.emotion||"").toLowerCase().includes(q)
+      );
+    }
+
+    // Sort newest first
+    filtered.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+
+    // Group by date
+    const groups={};
+    filtered.forEach(t=>{
+      const key = t.date||"Unknown";
+      if(!groups[key]) groups[key]=[];
+      groups[key].push(t);
+    });
+
+    return Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0]));
+  },[trades, filterOutcome, filterInstrument, searchQuery]);
+
+  const stats=useMemo(()=>{
+    const c=trades.map(t=>({...t,...calc(t)}));
+    const wins=c.filter(t=>t.pnl>0),losses=c.filter(t=>t.pnl<0);
+    const totalPnl=c.reduce((s,t)=>s+t.pnl,0);
+    const winRate=c.length?(wins.length/c.length)*100:0;
+    const avgWin=wins.length?wins.reduce((s,t)=>s+t.pnl,0)/wins.length:0;
+    const avgLoss=losses.length?losses.reduce((s,t)=>s+t.pnl,0)/losses.length:0;
+    const pf=Math.abs(avgLoss)>0?avgWin/Math.abs(avgLoss):0;
+    const best=c.length?Math.max(...c.map(t=>t.pnl)):0;
+    const worst=c.length?Math.min(...c.map(t=>t.pnl)):0;
+    const rT=c.filter(t=>t.r!==null);
+    const avgR=rT.length?rT.reduce((s,t)=>s+t.r,0)/rT.length:0;
+    let run=0;
+    const equity=[...trades].sort((a,b)=>a.date.localeCompare(b.date)).map(t=>{run+=calc(t).pnl;return{eq:run};});
+
+    // By session
+    const bySess={};
+    trades.forEach(t=>{const{pnl}=calc(t);if(!bySess[t.session])bySess[t.session]={pnl:0,count:0,wins:0};bySess[t.session].pnl+=pnl;bySess[t.session].count++;if(pnl>0)bySess[t.session].wins++;});
+
+    // By strategy
+    const bySt={};
+    trades.forEach(t=>{const{pnl}=calc(t);if(!bySt[t.strategy])bySt[t.strategy]={pnl:0,count:0};bySt[t.strategy].pnl+=pnl;bySt[t.strategy].count++;});
+
+    const streak=getStreak(trades);
+    return{totalPnl,winRate,wins:wins.length,losses:losses.length,total:c.length,avgWin,avgLoss,pf,best,worst,avgR,equity,bySess,bySt,streak};
+  },[trades]);
+
+  const TICKER_KEY = "logged_ticker_v1";
+  const CHECKLIST_KEY = "logged_checklist_v1";
+  const GOALS_KEY = "logged_goals_v1";
+  const DEFAULT_CHECKLIST = ["Waited for confirmation","Stop loss placed","Trading with the trend","Risk is within my limit","Not revenge trading"];
+  const ALL_STATS = ["Net P&L","Win Rate","Return","Profit Factor","Avg R","Total R","Trades","Streak","Avg Win","Avg Loss","Best Trade","Worst Trade"];
+  const [tickerStats, setTickerStats] = useState(()=>{try{return JSON.parse(localStorage.getItem("logged_ticker_v1")||'["Net P&L","Win Rate","Avg R","Trades"]')}catch{return ["Net P&L","Win Rate","Avg R","Trades"]}});
+  const [editTicker, setEditTicker] = useState(false);
+  const [checklistItems, setChecklistItems] = useState(()=>{try{return JSON.parse(localStorage.getItem(CHECKLIST_KEY)||JSON.stringify(DEFAULT_CHECKLIST))}catch{return DEFAULT_CHECKLIST}});
+  const [newCheckItem, setNewCheckItem] = useState("");
+  const [goals, setGoals] = useState(()=>{try{
+    const saved = JSON.parse(localStorage.getItem("logged_goals_v1")||"[]");
+    return saved.filter(g=>Array.isArray(g.targets));
+  }catch{return[]}});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterOutcome, setFilterOutcome] = useState("All");
+  const [filterInstrument, setFilterInstrument] = useState("All");
+  const [showSearch, setShowSearch] = useState(false);
+  const [statsTab, setStatsTab] = useState("stats");
+
+  // Force filters to All on first mount
+  useEffect(()=>{
+    setFilterOutcome("All");
+    setFilterInstrument("All");
+    setSearchQuery("");
+  },[]);
+
+  useEffect(()=>{localStorage.setItem(TICKER_KEY,JSON.stringify(tickerStats));},[tickerStats]);
+  useEffect(()=>{localStorage.setItem(CHECKLIST_KEY,JSON.stringify(checklistItems));},[checklistItems]);
+  useEffect(()=>{localStorage.setItem("logged_goals_v1",JSON.stringify(goals));},[goals]);
+
+  const getStatVal = (key) => {
+    const p = stats.totalPnl;
+    switch(key){
+      case "Net P&L": return {val:fmt(p),col:p>=0?"#00e5a0":"#ff4d6d"};
+      case "Win Rate": return {val:`${stats.winRate.toFixed(1)}%`,col:"var(--text)"};
+      case "Return": return balance>0?{val:`${p>=0?"+":""}${((p/balance)*100).toFixed(2)}%`,col:p>=0?"#00e5a0":"#ff4d6d"}:{val:"—",col:"var(--text4)"};
+      case "Profit Factor": return {val:stats.pf.toFixed(2),col:"var(--text)"};
+      case "Avg R": return {val:stats.avgR?`${stats.avgR>=0?"+":""}${stats.avgR.toFixed(2)}R`:"—",col:stats.avgR>=0?"#00e5a0":"#ff4d6d"};
+      case "Total R": {const rT=trades.filter(t=>calc(t).r!==null);const tot=Math.round(rT.reduce((s,t)=>s+(calc(t).r||0),0)*100)/100;return {val:rT.length?`${tot>=0?"+":""}${tot}R`:"—",col:tot>=0?"#00e5a0":"#ff4d6d"};}
+      case "Trades": return {val:stats.total,col:"var(--text)"};
+      case "Streak": return {val:stats.streak.count>0?`${stats.streak.count}${stats.streak.type}`:"—",col:stats.streak.type==="W"?"#00e5a0":"#ff4d6d"};
+      case "Avg Win": return {val:fmts(stats.avgWin),col:"#00e5a0"};
+      case "Avg Loss": return {val:fmts(stats.avgLoss),col:"#ff4d6d"};
+      case "Best Trade": return {val:fmt(stats.best),col:"#00e5a0"};
+      case "Worst Trade": return {val:fmt(stats.worst),col:"#ff4d6d"};
+      case "Balance": return balance>0?{val:`${curr.symbol}${(balance+stats.totalPnl).toLocaleString(curr.locale,{minimumFractionDigits:0,maximumFractionDigits:0})}`,col:stats.totalPnl>=0?"#00e5a0":"#ff4d6d"}:{val:"—",col:"var(--text4)"};
+      default: return {val:"—",col:"var(--text4)"};
+    }
+  };
+
+  const curr = CURRENCIES.find(c=>c.code===currency)||CURRENCIES[0];
+  const fmt = n=>`${n>=0?"+":"-"}${curr.symbol}${Math.abs(n).toLocaleString(curr.locale,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const fmts = n=>`${curr.symbol}${Math.abs(n).toLocaleString(curr.locale,{minimumFractionDigits:0,maximumFractionDigits:0})}`;
+  const {pnl:prevPnl,ticks:prevTicks,r:prevR}=calc(form);
+  const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)&&!window.MSStream;
+
+  if(showSplash) return <SplashScreen onDone={()=>setShowSplash(false)}/>;
+  if(!unlocked) return <PinScreen onUnlock={name=>{setTraderName(name);setUnlocked(true);}}/>;
+
+  const formatDate=d=>{
+    const [y,m,day]=d.split("-");
+    const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${months[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+  };
+
+  const dayPnl=trades=>{
+    return trades.reduce((s,t)=>s+calc(t).pnl,0);
+  };
+
+  return(
+    <div id="app" className={theme==="light"?"light":""}>
+      {lightbox&&<Lightbox images={lightbox.images} start={lightbox.start} onClose={()=>setLightbox(null)}/>}
+      {confirmDel&&<ConfirmDelete onConfirm={doDelete} onCancel={()=>setConfirmDel(null)}/>}
+
+      {/* Header */}
+      <div className="header">
+        <div style={{display:"flex",alignItems:"baseline",gap:8}}>
+          <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:17,color:"var(--text)"}}>LOGGED</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          {stats.streak.count>1&&(
+            <div className="streak-badge" style={{color:stats.streak.type==="W"?"#00e5a0":"#ff4d6d"}}>
+              {stats.streak.type==="W"?"🔥":"❄️"} {stats.streak.count} {stats.streak.type}
+            </div>
+          )}
+          {traderName&&<span style={{fontSize:13,color:"var(--text)",letterSpacing:"0.08em",fontWeight:500}}>{traderName.toUpperCase()}</span>}
+          {view==="add"?(
+            <button className="btn-ghost" style={{padding:"6px 12px",fontSize:10}} onClick={()=>{setEditId(null);setForm(blankForm());setView("journal");}}>
+              {editId?"Cancel":"✕"}
+            </button>
+          ):(
+            <button onClick={()=>setUnlocked(false)} style={{background:"none",border:"1px solid var(--border)",borderRadius:6,padding:"5px 10px",cursor:"pointer",display:"flex",alignItems:"center",gap:4}} title="Lock">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Ticker */}
+      <div className="ticker" style={{gap:0,padding:"0",position:"relative"}}>
+        <div style={{display:"flex",flex:1,overflowX:"hidden"}}>
+          {/* Balance — always locked first */}
+          {(()=>{
+            const {val,col}=getStatVal("Balance");
+            return(
+              <div style={{flex:1,padding:"6px 10px",borderRight:"1px solid #111418",position:"relative"}}>
+                <div style={{fontSize:7,letterSpacing:"0.12em",color:"var(--accent-dim)",textTransform:"uppercase",marginBottom:2,whiteSpace:"nowrap"}}>Balance</div>
+                <div style={{fontSize:12,fontWeight:500,color:col,whiteSpace:"nowrap"}}>{val}</div>
+              </div>
+            );
+          })()}
+          {/* 3 custom slots */}
+          {tickerStats.slice(0,4).map(key=>{
+            const {val,col}=getStatVal(key);
+            return(
+              <div key={key} style={{flex:1,padding:"6px 10px",borderRight:"1px solid #111418"}}>
+                <div style={{fontSize:7,letterSpacing:"0.12em",color:"var(--text4)",textTransform:"uppercase",marginBottom:2,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{key}</div>
+                <div style={{fontSize:12,fontWeight:500,color:col,whiteSpace:"nowrap"}}>{val}</div>
+              </div>
+            );
+          })}
+        </div>
+        <button onClick={()=>setEditTicker(true)} style={{background:"none",border:"none",borderLeft:"1px solid var(--border)",padding:"0 10px",cursor:"pointer",color:"var(--text5)",flexShrink:0,display:"flex",alignItems:"center"}}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      {/* Ticker picker sheet */}
+      {editTicker&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",zIndex:200,display:"flex",alignItems:"flex-end"}} onClick={()=>setEditTicker(false)}>
+          <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:"16px 16px 0 0",padding:"20px",width:"100%",paddingBottom:`calc(20px + env(safe-area-inset-bottom))`}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+              <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:16,color:"var(--text)"}}>Customise Ticker</div>
+              <button onClick={()=>setEditTicker(false)} style={{background:"none",border:"none",color:"var(--text3)",fontSize:18,cursor:"pointer"}}>✕</button>
+            </div>
+            <div style={{fontSize:11,color:"var(--text4)",marginBottom:4}}>Balance is always shown. Pick 4 more.</div>
+            {/* Locked Balance slot */}
+            <div style={{display:"flex",alignItems:"center",gap:10,padding:"10px 12px",background:"var(--accent-bg)",border:"1px solid #00e5a020",borderRadius:8,marginBottom:12}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#00e5a040" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span style={{fontSize:12,color:"var(--accent-dim)",flex:1}}>Balance</span>
+              <span style={{fontSize:11,color:"#00e5a0"}}>{getStatVal("Balance").val}</span>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+              {ALL_STATS.map(key=>{
+                const active = tickerStats.includes(key);
+                const {val,col} = getStatVal(key);
+                return(
+                  <button key={key} onClick={()=>{
+                    if(active){if(tickerStats.length>1)setTickerStats(t=>t.filter(k=>k!==key));}
+                    else{if(tickerStats.length<4)setTickerStats(t=>[...t,key]);}
+                  }} style={{background:active?"#00e5a015":"#111418",border:`1px solid ${active?"#00e5a040":"#1e2530"}`,borderRadius:8,padding:"10px 12px",cursor:"pointer",textAlign:"left",transition:"all 0.15s",opacity:(!active&&tickerStats.length>=4)?0.4:1}}>
+                    <div style={{fontSize:9,letterSpacing:"0.12em",color:active?"var(--accent-dim)":"var(--text4)",textTransform:"uppercase",marginBottom:3}}>{key}</div>
+                    <div style={{fontSize:14,fontWeight:500,color:active?col:"var(--text5)"}}>{val}</div>
+                  </button>
+                );
+              })}
+            </div>
+            <div style={{marginTop:12,fontSize:10,color:"var(--text5)",textAlign:"center"}}>{tickerStats.length}/4 selected</div>
+          </div>
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="content">
+
+        {/* JOURNAL */}
+        {view==="journal"&&(
+          <>
+            {showInstall&&(
+              <div className="install-banner">
+                <div style={{fontSize:22}}>📲</div>
+                <p>
+                  {isIOS
+                    ? <>Tap <strong>Share</strong> then <strong>"Add to Home Screen"</strong> to install Logged as an app.</>
+                    : <>Tap <strong>Install</strong> to add Logged to your home screen.</>
+                  }
+                </p>
+                {!isIOS&&deferredPrompt&&(
+                  <button onClick={async()=>{deferredPrompt.prompt();const r=await deferredPrompt.userChoice;if(r.outcome==="accepted")setShowInstall(false);}}>Install</button>
+                )}
+                {isIOS&&<button onClick={()=>setShowInstall(false)}>Got it</button>}
+              </div>
+            )}
+
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+              <div className="section-title" style={{marginBottom:0}}>Trade Log</div>
+              <button onClick={()=>setShowSearch(s=>!s)} style={{background:showSearch?"var(--accent-bg)":"none",border:`1px solid ${showSearch?"var(--accent)":"var(--border3)"}`,borderRadius:8,padding:"7px 12px",cursor:"pointer",display:"flex",alignItems:"center",gap:6,color:showSearch?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <span style={{fontSize:11,fontFamily:"'DM Mono',monospace"}}>Filter</span>
+              </button>
+            </div>
+
+            {/* Search & Filter panel */}
+            {showSearch&&(
+              <div style={{background:"var(--surface)",border:"1px solid var(--border)",borderRadius:10,padding:"12px",marginBottom:14}}>
+                <input className="field-input" placeholder="Search notes, instrument, strategy..." value={searchQuery}
+                  onChange={e=>setSearchQuery(e.target.value)}
+                  style={{marginBottom:10,fontSize:14,padding:"10px 12px"}}/>
+                <div style={{display:"flex",gap:6,marginBottom:8,flexWrap:"wrap"}}>
+                  <span style={{fontSize:9,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase",alignSelf:"center",marginRight:2}}>Outcome:</span>
+                  {["All","TP","SL","Partial","BE"].map(o=>(
+                    <button key={o} onClick={()=>setFilterOutcome(o)} style={{padding:"4px 10px",border:`1px solid ${filterOutcome===o?"var(--accent)":"var(--border2)"}`,borderRadius:6,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",background:filterOutcome===o?"var(--accent-bg)":"var(--surface2)",color:filterOutcome===o?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>{o}</button>
+                  ))}
+                </div>
+                <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+                  <span style={{fontSize:9,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase",alignSelf:"center",marginRight:2}}>Instrument:</span>
+                  <button onClick={()=>setFilterInstrument("All")} style={{padding:"4px 10px",border:`1px solid ${filterInstrument==="All"?"var(--accent)":"var(--border2)"}`,borderRadius:6,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",background:filterInstrument==="All"?"var(--accent-bg)":"var(--surface2)",color:filterInstrument==="All"?"var(--accent)":"var(--text4)"}}>All</button>
+                  {INSTRUMENTS.map(i=>(
+                    <button key={i.symbol} onClick={()=>setFilterInstrument(i.symbol)} style={{padding:"4px 10px",border:`1px solid ${filterInstrument===i.symbol?"var(--accent)":"var(--border2)"}`,borderRadius:6,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",background:filterInstrument===i.symbol?"var(--accent-bg)":"var(--surface2)",color:filterInstrument===i.symbol?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>{i.symbol}</button>
+                  ))}
+                </div>
+                {(searchQuery||filterOutcome!=="All"||filterInstrument!=="All")&&(
+                  <button onClick={()=>{setSearchQuery("");setFilterOutcome("All");setFilterInstrument("All");}} style={{marginTop:8,background:"none",border:"none",color:"var(--text4)",fontSize:11,fontFamily:"'DM Mono',monospace",cursor:"pointer",textDecoration:"underline"}}>Clear filters</button>
+                )}
+              </div>
+            )}
+
+            {/* Consecutive loss warning */}
+            {stats.streak.type==="L"&&stats.streak.count>=2&&(
+              <div style={{background:"#ff4d6d12",border:"1px solid #ff4d6d30",borderRadius:10,padding:"12px 14px",marginBottom:14,display:"flex",gap:12,alignItems:"center"}}>
+                <span style={{fontSize:22}}>⚠️</span>
+                <div>
+                  <div style={{fontSize:13,color:"#ff4d6d",fontWeight:500,marginBottom:2}}>{stats.streak.count} losses in a row</div>
+                  <div style={{fontSize:11,color:"var(--text3)",lineHeight:1.5}}>Consider stepping away. Protect your capital.</div>
+                </div>
+              </div>
+            )}
+
+            {trades.length===0?(
+              <div className="empty">
+                <div className="empty-icon">📋</div>
+                <div className="empty-title">No trades yet</div>
+                <div className="empty-sub">Tap + Log to get started</div>
+                <button className="btn-primary" style={{width:"auto",padding:"12px 28px"}} onClick={()=>setView("add")}>+ Log Trade</button>
+              </div>
+            ):groupedTrades.length===0?(
+              <div className="empty">
+                <div className="empty-icon">🔍</div>
+                <div className="empty-title">No matches</div>
+                <div className="empty-sub">No trades match your current filters</div>
+                <button className="btn-primary" style={{width:"auto",padding:"12px 28px"}} onClick={()=>{setSearchQuery("");setFilterOutcome("All");setFilterInstrument("All");}}>Clear Filters</button>
+              </div>
+            ):(
+              groupedTrades.map(([date, dayTrades])=>{
+                const dp=dayPnl(dayTrades);
+                return(
+                  <div key={date}>
+                    <div className="date-sep">
+                      <span>{formatDate(date)}</span>
+                      <span style={{color:dp>=0?"#00e5a060":"#ff4d6d60",fontSize:11}}>{fmt(dp)}</span>
+                    </div>
+                    {dayTrades.map(trade=>{
+                      const {pnl,ticks,r}=calc(trade);
+                      const imgs=trade.images||[];
+                      const isExp=expanded===trade.id;
+                      return(
+                        <div key={trade.id} className="trade-card">
+                          <div className="trade-card-header" onClick={()=>setExpanded(isExp?null:trade.id)}>
+                            <div style={{flex:1}}>
+                              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                                <span style={{fontSize:13,fontWeight:500,color:"var(--text)"}}>{trade.instrument}</span>
+                                <span style={{fontSize:11,color:trade.direction==="Long"?"#00e5a0":"#ff4d6d"}}>{trade.direction==="Long"?"▲ Long":"▼ Short"}</span>
+                                <span style={{fontSize:11,color:"var(--text3)"}}>{trade.contracts}x</span>
+                                {trade.outcome&&<span style={{fontSize:9,letterSpacing:"0.08em",padding:"2px 6px",borderRadius:4,background:
+                                  trade.outcome==="SL"?"#ff4d6d20":trade.outcome==="BE"?"#71809620":trade.outcome==="Partial"?"#f6ad5520":"#00e5a020",
+                                  color:trade.outcome==="SL"?"#ff4d6d":trade.outcome==="BE"?"var(--text3)":trade.outcome==="Partial"?"#f6ad55":"#00e5a0"}}>
+                                  {trade.outcome==="SL"?"● SL":trade.outcome==="BE"?"● BE":trade.outcome==="Partial"?"● PARTIAL":"● TP"}
+                                </span>}
+                                {imgs.length>0&&<span style={{fontSize:10,color:"var(--text3)"}}>📷{imgs.length}</span>}
+                                {trade.emotion&&<span style={{fontSize:10,color:"var(--text3)"}}>{trade.emotion.split(" ")[0]}</span>}
+                                {trade.checklist&&trade.checklist.length>0&&(
+                                  <span style={{fontSize:9,padding:"2px 6px",borderRadius:4,background: trade.checklist.length===checklistItems.length?"#00e5a020":"var(--border)",color:trade.checklist.length===checklistItems.length?"var(--accent)":"var(--text3)",letterSpacing:"0.05em"}}>
+                                    ✓ {trade.checklist.length}/{checklistItems.length}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{display:"flex",gap:16}}>
+                                <div>
+                                  <div style={{fontSize:9,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase"}}>P&L</div>
+                                  <div style={{fontSize:16,fontWeight:500,color:pnl>=0?"#00e5a0":"#ff4d6d"}}>{fmt(pnl)}</div>
+                                </div>
+                                <div>
+                                  <div style={{fontSize:9,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase"}}>Ticks</div>
+                                  <div style={{fontSize:16,color:ticks>=0?"#00e5a0":"#ff4d6d"}}>{ticks>=0?"+":""}{ticks}</div>
+                                </div>
+                                {r!==null&&<div>
+                                  <div style={{fontSize:9,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase"}}>R</div>
+                                  <div style={{fontSize:16,color:r>=0?"#00e5a060":"#ff4d6d60"}}>{r>=0?"+":""}{r}R</div>
+                                </div>}
+                              </div>
+                            </div>
+                            <div style={{textAlign:"right"}}>
+                              <div style={{fontSize:10,color:"var(--text5)"}}>{isExp?"▲":"▼"}</div>
+                            </div>
+                          </div>
+
+                          {isExp&&(
+                            <div className="trade-card-body" style={{paddingTop:12}}>
+                              <div style={{display:"flex",gap:10,marginBottom:10,flexWrap:"wrap"}}>
+                                <div style={{flex:1,minWidth:60}}>
+                                  <div style={{fontSize:9,color:"var(--text4)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Entry</div>
+                                  <div style={{fontSize:13,color:"var(--text2)"}}>{parseFloat(trade.entry).toFixed(2)}</div>
+                                </div>
+                                {(trade.tps||[]).filter(tp=>tp.price).map((tp,i)=>(
+                                  <div key={i} style={{flex:1,minWidth:60}}>
+                                    <div style={{fontSize:9,color:"var(--text4)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>TP{i+1}{i===(trade.tps.filter(tp=>tp.price).length-1)?" (Final)":""}</div>
+                                    <div style={{fontSize:13,color:"#00e5a080"}}>{parseFloat(tp.price).toFixed(2)}</div>
+                                    <div style={{fontSize:10,color:"var(--text4)"}}>{tp.contracts} ct</div>
+                                  </div>
+                                ))}
+                                {/* Legacy single exit */}
+                                {(!trade.tps||trade.tps.length===0)&&trade.exit&&(
+                                  <div style={{flex:1,minWidth:60}}>
+                                    <div style={{fontSize:9,color:"var(--text4)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Take Profit</div>
+                                    <div style={{fontSize:13,color:"var(--text2)"}}>{parseFloat(trade.exit).toFixed(2)}</div>
+                                  </div>
+                                )}
+                                {trade.stop&&<div style={{flex:1,minWidth:60}}>
+                                  <div style={{fontSize:9,color:"var(--text4)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:2}}>Stop</div>
+                                  <div style={{fontSize:13,color:"#ff4d6d80"}}>{parseFloat(trade.stop).toFixed(2)}</div>
+                                </div>}
+                              </div>
+
+                              <div className="trade-meta">
+                                <span className="tag">{trade.strategy}</span>
+                                <span className="tag">{trade.setup}</span>
+                                {trade.session&&<span className="tag">{trade.session}</span>}
+                                {trade.emotion&&<span className="tag">{trade.emotion}</span>}
+                              </div>
+
+                              {trade.notes&&<div style={{marginTop:10,fontSize:12,color:"var(--text2)",lineHeight:1.7}}>{trade.notes}</div>}
+
+                              {trade.checklist&&trade.checklist.length>0&&(
+                                <div style={{marginTop:10}}>
+                                  <div style={{fontSize:9,color:"var(--text4)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Pre-Trade Checklist</div>
+                                  <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
+                                    {checklistItems.map((item,i)=>{
+                                      const checked=(trade.checklist||[]).includes(item);
+                                      return(
+                                        <span key={i} style={{fontSize:10,padding:"3px 8px",borderRadius:4,background:checked?"var(--accent-bg)":"var(--surface2)",color:checked?"#00e5a0":"var(--text5)",border:`1px solid ${checked?"#00e5a030":"var(--border)"}`}}>
+                                          {checked?"✓":"✗"} {item}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              )}
+
+                              {imgs.length>0&&(
+                                <div style={{marginTop:10}}>
+                                  <div style={{fontSize:9,color:"var(--text4)",textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Charts — tap to enlarge</div>
+                                  <div className="thumb-row">
+                                    {imgs.map((img,i)=>(
+                                      <div key={img.id} style={{cursor:"pointer"}} onClick={()=>setLightbox({images:imgs,start:i})}>
+                                        <img src={img.dataUrl} alt="" style={{width:80,height:56,objectFit:"cover",borderRadius:6,border:"1px solid var(--border)"}}/>
+                                        {img.label&&<div style={{fontSize:8,color:"var(--text4)",textAlign:"center",marginTop:2,maxWidth:80,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{img.label}</div>}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              <div style={{display:"flex",gap:8,marginTop:12}}>
+                                <button className="btn-ghost" style={{flex:1}} onClick={()=>edit(trade)}>Edit</button>
+                                <button className="btn-danger" style={{flex:1}} onClick={()=>confirmDelete(trade.id)}>Delete</button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })
+            )}
+          </>
+        )}
+
+        {/* ADD / EDIT */}
+        {view==="add"&&(
+          <div>
+            <div className="section-title">{editId?"Edit Trade":"Log Trade"}</div>
+
+            <div className="grid2">
+              <div className="field-group">
+                <label className="field-label">Date</label>
+                <input type="date" className="field-input" value={form.date} onChange={setF("date")}/>
+              </div>
+              <div className="field-group">
+                <label className="field-label">Instrument</label>
+                <select className="field-input" value={form.instrument} onChange={setF("instrument")}>
+                  {INSTRUMENTS.map(i=><option key={i.symbol} value={i.symbol}>{i.symbol} ({i.name})</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label className="field-label">Direction</label>
+              <div style={{display:"flex",gap:10}}>
+                <button className={`dir-btn${form.direction==="Long"?" long-active":""}`} onClick={()=>setFv("direction","Long")}>▲ Long</button>
+                <button className={`dir-btn${form.direction==="Short"?" short-active":""}`} onClick={()=>setFv("direction","Short")}>▼ Short</button>
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label className="field-label">Outcome</label>
+              <div style={{display:"flex",gap:8}}>
+                {[{k:"TP",label:"Hit TP",col:"#00e5a0"},{k:"SL",label:"Hit SL",col:"#ff4d6d"},{k:"Partial",label:"Partial",col:"#f6ad55"},{k:"BE",label:"Breakeven",col:"var(--text3)"}].map(o=>(
+                  <button key={o.k} onClick={()=>setFv("outcome",o.k)} style={{flex:1,padding:"9px 4px",border:"1px solid",borderRadius:8,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",transition:"all 0.15s",
+                    borderColor:form.outcome===o.k?o.col:"#1e2530",
+                    background:form.outcome===o.k?`${o.col}15`:"#111418",
+                    color:form.outcome===o.k?o.col:"var(--text4)"}}>{o.label}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid2">
+              <div className="field-group">
+                <label className="field-label">Contracts</label>
+                <input type="number" inputMode="numeric" className="field-input" value={form.contracts}
+                  onChange={e=>setFv("contracts",e.target.value===""?"":parseInt(e.target.value)||1)}
+                  onBlur={e=>setFv("contracts",parseInt(e.target.value)||1)}/>
+              </div>
+              <div className="field-group">
+                <label className="field-label">Entry</label>
+                <input type="number" inputMode="decimal" step="0.01" placeholder="0.00" className="field-input" value={form.entry} onChange={setF("entry")}/>
+              </div>
+              <div className="field-group">
+                <label className="field-label">Stop Loss</label>
+                <input type="number" inputMode="decimal" step="0.01" placeholder="0.00" className="field-input" value={form.stop} onChange={setF("stop")}/>
+              </div>
+            </div>
+
+            {/* Take Profit levels */}
+            <div className="field-group">
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                <label className="field-label" style={{margin:0}}>Take Profit Levels</label>
+                {(form.tps||[]).length < 3 && (
+                  <button onClick={()=>setForm(f=>({...f,tps:[...(f.tps||[]),{price:"",contracts:""}]}))}
+                    style={{background:"none",border:"1px solid var(--accent-dim)",borderRadius:6,padding:"3px 10px",color:"var(--accent)",fontSize:11,fontFamily:"'DM Mono',monospace",cursor:"pointer"}}>
+                    + Add TP
+                  </button>
+                )}
+              </div>
+              {(form.tps||[{price:"",contracts:""}]).map((tp,i)=>(
+                <div key={i} style={{display:"flex",gap:8,marginBottom:8,alignItems:"center"}}>
+                  <div style={{width:32,fontSize:10,color:"var(--text4)",textAlign:"center",letterSpacing:"0.05em",flexShrink:0}}>TP{i+1}</div>
+                  <input type="number" inputMode="decimal" step="0.01" placeholder="Price" className="field-input" style={{flex:2}}
+                    value={tp.price} onChange={e=>setForm(f=>({...f,tps:(f.tps||[]).map((t,j)=>j===i?{...t,price:e.target.value}:t)}))}/>
+                  <input type="number" inputMode="numeric" placeholder="Qty" className="field-input" style={{flex:1}}
+                    value={tp.contracts} onChange={e=>setForm(f=>({...f,tps:(f.tps||[]).map((t,j)=>j===i?{...t,contracts:e.target.value}:t)}))}/>
+                  {(form.tps||[]).length > 1 && (
+                    <button onClick={()=>setForm(f=>({...f,tps:f.tps.filter((_,j)=>j!==i)}))}
+                      style={{background:"none",border:"none",color:"var(--text5)",fontSize:18,cursor:"pointer",padding:"0 4px",flexShrink:0}} onMouseEnter={e=>e.target.style.color="#ff4d6d"} onMouseLeave={e=>e.target.style.color="var(--text5)"}>×</button>
+                  )}
+                </div>
+              ))}
+              {(form.tps||[]).length>1&&(()=>{
+                const inst=INSTRUMENTS.find(i=>i.symbol===form.instrument);
+                const filledTps=(form.tps||[]).filter(tp=>tp.price&&tp.contracts);
+                if(!inst||filledTps.length<2) return null;
+                const total=filledTps.reduce((s,tp)=>s+(parseInt(tp.contracts)||0),0);
+                const wAvg=filledTps.reduce((s,tp)=>s+(parseFloat(tp.price)||0)*(parseInt(tp.contracts)||0),0)/total;
+                return <div style={{fontSize:10,color:"var(--text4)",marginTop:4}}>Avg exit: <span style={{color:"var(--text2)"}}>{wAvg.toFixed(2)}</span> across {total} contracts</div>;
+              })()}
+            </div>
+
+            <div className="grid2">
+              <div className="field-group">
+                <label className="field-label">Setup</label>
+                <select className="field-input" value={form.setup} onChange={setF("setup")}>
+                  {SETUPS.map(s=><option key={s}>{s}</option>)}
+                </select>
+              </div>
+              <div className="field-group">
+                <label className="field-label">Strategy</label>
+                <select className="field-input" value={form.strategy} onChange={setF("strategy")}>
+                  {STRATEGIES.map(s=><option key={s}>{s}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label className="field-label">Session</label>
+              <div style={{display:"flex",gap:8}}>
+                {SESSIONS.map(s=>(
+                  <button key={s} onClick={()=>setFv("session",s)} style={{flex:1,padding:"10px 4px",border:"1px solid",borderRadius:8,cursor:"pointer",fontSize:12,fontFamily:"'DM Mono',monospace",transition:"all 0.15s",borderColor:form.session===s?"var(--accent)":"var(--border2)",background:form.session===s?"var(--accent-bg)":"var(--surface2)",color:form.session===s?"var(--accent)":"var(--text4)"}}>{s}</button>
+                ))}
+              </div>
+            </div>
+
+            <div className="field-group">
+              <label className="field-label">How were you feeling?</label>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                {EMOTIONS.map(e=>(
+                  <button key={e} onClick={()=>setFv("emotion",form.emotion===e?"":e)}
+                    style={{padding:"10px 8px",border:`1px solid ${form.emotion===e?"var(--accent)":"var(--border2)"}`,borderRadius:8,cursor:"pointer",fontSize:12,fontFamily:"'DM Mono',monospace",background:form.emotion===e?"var(--accent-bg)":"var(--surface2)",color:form.emotion===e?"var(--accent)":"var(--text3)",transition:"all 0.15s",textAlign:"left"}}>{e}</button>
+                ))}
+              </div>
+            </div>
+
+            {form.entry&&(form.tps||[]).some(tp=>tp.price&&tp.contracts)&&(
+              <div className="pnl-preview" style={{borderColor:prevPnl>=0?"#00e5a020":"#ff4d6d20"}}>
+                <div className="pnl-box">
+                  <label>Est. P&L</label>
+                  <span style={{color:prevPnl>=0?"#00e5a0":"#ff4d6d"}}>{fmt(prevPnl)}</span>
+                </div>
+                <div className="pnl-box">
+                  <label>Ticks</label>
+                  <span style={{color:"var(--text)"}}>{prevTicks>=0?"+":""}{prevTicks}</span>
+                </div>
+                {prevR!==null&&<div className="pnl-box">
+                  <label>R</label>
+                  <span style={{color:prevR>=0?"#00e5a0":"#ff4d6d"}}>{prevR>=0?"+":""}{prevR}R</span>
+                </div>}
+              </div>
+            )}
+
+            {/* Pre-trade checklist */}
+            {checklistItems.length>0&&(
+              <div className="field-group">
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
+                  <label className="field-label" style={{margin:0}}>Pre-Trade Checklist</label>
+                  <span style={{fontSize:10,color:(form.checklist||[]).length===checklistItems.length?"var(--accent)":"var(--text4)"}}>
+                    {(form.checklist||[]).length}/{checklistItems.length}
+                  </span>
+                </div>
+                {checklistItems.map((item,i)=>{
+                  const checked=(form.checklist||[]).includes(item);
+                  return(
+                    <div key={i} onClick={()=>setForm(f=>({...f,checklist:checked?(f.checklist||[]).filter(c=>c!==item):[...(f.checklist||[]),item]}))}
+                      style={{display:"flex",alignItems:"center",gap:12,padding:"11px 14px",background:checked?"#00e5a010":"#111418",border:`1px solid ${checked?"#00e5a030":"#1e2530"}`,borderRadius:8,marginBottom:8,cursor:"pointer",transition:"all 0.15s"}}>
+                      <div style={{width:20,height:20,borderRadius:6,border:`2px solid ${checked?"#00e5a0":"var(--text5)"}`,background:checked?"#00e5a0":"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.15s"}}>
+                        {checked&&<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#0a0c10" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                      </div>
+                      <span style={{fontSize:13,color:checked?"var(--text)":"var(--text3)",transition:"color 0.15s"}}>{item}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            <div className="field-group">
+              <label className="field-label">Notes</label>
+              <textarea className="field-input" rows={3} placeholder="Rationale, mistakes, lessons..." value={form.notes} onChange={setF("notes")} style={{resize:"vertical",lineHeight:1.6}}/>
+            </div>
+
+            <div className="field-group">
+              <label className="field-label" style={{marginBottom:8}}>Chart Screenshots</label>
+              <ImageUploader images={form.images||[]} onChange={upd=>setForm(f=>({...f,images:typeof upd==="function"?upd(f.images||[]):upd}))}/>
+            </div>
+
+            <button className="btn-primary" onClick={submit} style={{marginBottom:8}}>
+              {editId?"Update Trade":"Log Trade"}
+            </button>
+          </div>
+        )}
+
+        {/* STATS */}
+        {view==="stats"&&(
+          <>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+              <div className="section-title" style={{marginBottom:0}}>
+                {statsTab==="stats"?"Performance":"Calendar"}
+              </div>
+              <div style={{display:"flex",gap:2,background:"var(--surface2)",borderRadius:8,padding:3}}>
+                <button onClick={()=>setStatsTab("stats")} style={{padding:"6px 14px",borderRadius:6,border:"none",cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",background:statsTab==="stats"?"var(--accent-bg)":"transparent",color:statsTab==="stats"?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>Stats</button>
+                <button onClick={()=>setStatsTab("calendar")} style={{padding:"6px 14px",borderRadius:6,border:"none",cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",background:statsTab==="calendar"?"var(--accent-bg)":"transparent",color:statsTab==="calendar"?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>Calendar</button>
+              </div>
+            </div>
+
+            {statsTab==="calendar"&&<CalendarView trades={trades} fmt={fmt} calc={calc} curr={curr}/>}
+
+            {statsTab==="stats"&&(<>
+            {stats.total===0?(
+              <div className="empty">
+                <div className="empty-icon">📊</div>
+                <div className="empty-title">No data yet</div>
+                <div className="empty-sub">Log trades to see your stats</div>
+              </div>
+            ):(
+              <>
+                {/* Export buttons moved to Settings */}
+
+                <div className="stat-card" style={{marginBottom:12}}>
+                  <div className="stat-label">Equity Curve</div>
+                  <EquityCurve equity={stats.equity} totalPnl={stats.totalPnl} balance={balance} curr={curr}/>
+                </div>
+
+                <div className="stat-grid">
+                  {[
+                    {l:"Net P&L",v:fmt(stats.totalPnl),c:stats.totalPnl>=0?"#00e5a0":"#ff4d6d"},
+                    {l:"Win Rate",v:`${stats.winRate.toFixed(1)}%`,s:`${stats.wins}W / ${stats.losses}L`},
+                    ...(balance>0?[
+                      {l:"Total Return",v:`${stats.totalPnl>=0?"+":""}${((stats.totalPnl/balance)*100).toFixed(2)}%`,c:stats.totalPnl>=0?"#00e5a0":"#ff4d6d"},
+                      {l:"Avg Risk/Trade",v:stats.total>0?`${(Math.abs(stats.avgLoss)/balance*100).toFixed(2)}%`:"—",c:"#f6ad55"},
+                    ]:[]),
+                    {l:"Profit Factor",v:stats.pf.toFixed(2)},
+                    {l:"Avg R",v:stats.avgR?`${stats.avgR>=0?"+":""}${stats.avgR.toFixed(2)}R`:"—",c:stats.avgR>=0?"#00e5a0":"#ff4d6d"},
+                    {l:"Total R",v:(()=>{const rT=trades.filter(t=>calc(t).r!==null);const tot=Math.round(rT.reduce((s,t)=>s+(calc(t).r||0),0)*100)/100;return rT.length?`${tot>=0?"+":""}${tot}R`:"—";})(),c:(()=>{const rT=trades.filter(t=>calc(t).r!==null);const tot=rT.reduce((s,t)=>s+(calc(t).r||0),0);return tot>=0?"#00e5a0":"#ff4d6d";})()},
+                    {l:"Avg Win",v:fmts(stats.avgWin),c:"#00e5a0"},
+                    {l:"Avg Loss",v:fmts(stats.avgLoss),c:"#ff4d6d"},
+                    {l:"Best Trade",v:fmt(stats.best),c:"#00e5a0"},
+                    {l:"Worst Trade",v:fmt(stats.worst),c:"#ff4d6d"},
+                    {l:"Total Trades",v:stats.total},
+                    {l:"Current Streak",v:`${stats.streak.count}${stats.streak.type}`,c:stats.streak.type==="W"?"#00e5a0":"#ff4d6d"},
+                  ].map(s=>(
+                    <div key={s.l} className="stat-card">
+                      <div className="stat-label">{s.l}</div>
+                      <div className="stat-value" style={{color:s.c||"var(--text)"}}>{s.v}</div>
+                      {s.s&&<div className="stat-sub">{s.s}</div>}
+                    </div>
+                  ))}
+                </div>
+
+                {/* By Session */}
+                {Object.keys(stats.bySess).length>0&&(()=>{
+                  const rows=Object.entries(stats.bySess).sort((a,b)=>b[1].pnl-a[1].pnl);
+                  const maxAbs=Math.max(...rows.map(r=>Math.abs(r[1].pnl)));
+                  return(
+                    <div className="stat-card" style={{marginBottom:12}}>
+                      <div className="stat-label" style={{marginBottom:14}}>By Session</div>
+                      {rows.map(([s,d])=>(
+                        <div key={s} style={{marginBottom:12}}>
+                          <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                            <span style={{fontSize:12,color:"var(--text2)"}}>{s}</span>
+                            <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                              <span style={{fontSize:10,color:"var(--text4)"}}>{d.count} trades · {d.count?Math.round(d.wins/d.count*100):0}% win</span>
+                              <span style={{fontSize:12,color:d.pnl>=0?"#00e5a0":"#ff4d6d"}}>{fmt(d.pnl)}</span>
+                            </div>
+                          </div>
+                          <div style={{height:4,background:"var(--tag-bg)",borderRadius:2,overflow:"hidden"}}>
+                            <div style={{height:"100%",width:`${Math.min(100,Math.abs(d.pnl)/maxAbs*100)}%`,background:d.pnl>=0?"#00e5a0":"#ff4d6d",borderRadius:2}}/>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+
+                {/* By Strategy */}
+                {Object.keys(stats.bySt).length>0&&(()=>{
+                  const rows=Object.entries(stats.bySt).sort((a,b)=>b[1].pnl-a[1].pnl);
+                  const maxAbs=Math.max(...rows.map(r=>Math.abs(r[1].pnl)));
+                  return(
+                    <div className="stat-card">
+                      <div className="stat-label" style={{marginBottom:14}}>By Strategy</div>
+                      {rows.map(([s,d])=>(
+                        <div key={s} style={{marginBottom:12}}>
+                          <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+                            <span style={{fontSize:12,color:"var(--text2)"}}>{s}</span>
+                            <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                              <span style={{fontSize:10,color:"var(--text4)"}}>{d.count} trades</span>
+                              <span style={{fontSize:12,color:d.pnl>=0?"#00e5a0":"#ff4d6d"}}>{fmt(d.pnl)}</span>
+                            </div>
+                          </div>
+                          <div style={{height:4,background:"var(--tag-bg)",borderRadius:2,overflow:"hidden"}}>
+                            <div style={{height:"100%",width:`${Math.min(100,Math.abs(d.pnl)/maxAbs*100)}%`,background:d.pnl>=0?"#00e5a0":"#ff4d6d",borderRadius:2}}/>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </>
+            )}
+            </>)}
+          </>
+        )}
+
+        {/* SETTINGS */}
+        {view==="settings"&&(
+          <>
+            <div className="section-title">Settings</div>
+
+            {/* Account Balance */}
+            <div style={{marginBottom:8,fontSize:10,letterSpacing:"0.12em",color:"var(--text4)",textTransform:"uppercase"}}>Account</div>
+            <BalanceCard balance={balance} setBalance={setBalance} stats={stats} currency={currency} setCurrency={setCurrency} curr={curr}/>
+
+            {/* Appearance */}
+            <div style={{marginTop:20,marginBottom:8,fontSize:10,letterSpacing:"0.12em",color:"var(--text4)",textTransform:"uppercase"}}>Appearance</div>
+            <div className="stat-card" style={{marginBottom:10}}>
+              <div style={{fontSize:13,color:"var(--text)",marginBottom:12}}>Theme</div>
+              <div style={{display:"flex",gap:8}}>
+                {[{k:"dark",l:"🌙 Dark"},{k:"light",l:"☀️ Light"}].map(t=>(
+                  <button key={t.k} onClick={()=>setTheme(t.k)} style={{flex:1,padding:"12px",border:`1px solid ${theme===t.k?"var(--accent)":"var(--border2)"}`,borderRadius:8,cursor:"pointer",fontSize:13,fontFamily:"'DM Mono',monospace",background:theme===t.k?"#00e5a015":"var(--input-bg)",color:theme===t.k?"var(--accent)":"var(--text4)",transition:"all 0.15s"}}>{t.l}</button>
+                ))}
+              </div>
+              <div style={{marginTop:14,fontSize:13,color:"var(--text)",marginBottom:10}}>Goal Progress Colours</div>
+              <div style={{display:"flex",gap:8}}>
+                {[{k:"simple",l:"🟢 Simple",d:"Green / Red only"},{k:"traffic",l:"🚦 Traffic Light",d:"Green / Amber / Red"}].map(t=>(
+                  <button key={t.k} onClick={()=>setGoalColour(t.k)} style={{flex:1,padding:"10px 8px",border:`1px solid ${goalColour===t.k?"var(--accent)":"var(--border2)"}`,borderRadius:8,cursor:"pointer",fontSize:11,fontFamily:"'DM Mono',monospace",background:goalColour===t.k?"var(--accent-bg)":"var(--input-bg)",color:goalColour===t.k?"var(--accent)":"var(--text4)",transition:"all 0.15s",textAlign:"left"}}>
+                    <div>{t.l}</div>
+                    <div style={{fontSize:9,color:"var(--text5)",marginTop:2}}>{t.d}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Profile */}
+            <div style={{marginTop:20,marginBottom:8,fontSize:10,letterSpacing:"0.12em",color:"var(--text4)",textTransform:"uppercase"}}>Profile</div>
+            <div className="stat-card" style={{marginBottom:10}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+                <div>
+                  <div style={{fontSize:10,color:"var(--text4)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:4}}>Trader Name</div>
+                  <div style={{fontSize:18,color:"var(--text)",fontWeight:500}}>{traderName}</div>
+                </div>
+                <div style={{width:40,height:40,borderRadius:"50%",background:"var(--accent-bg)",border:"1px solid var(--accent-dim)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,color:"#00e5a0",fontFamily:"'Syne',sans-serif",fontWeight:800}}>
+                  {traderName.charAt(0).toUpperCase()}
+                </div>
+              </div>
+              <EditNameRow traderName={traderName} onSave={name=>{
+                setTraderName(name);
+                const profile = JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}");
+                localStorage.setItem(PROFILE_KEY, JSON.stringify({...profile, name}));
+              }}/>
+            </div>
+
+            {/* Pre-trade Checklist */}
+            <div style={{marginTop:20,marginBottom:8,fontSize:10,letterSpacing:"0.12em",color:"var(--text4)",textTransform:"uppercase"}}>Pre-Trade Checklist</div>
+            <div className="stat-card" style={{marginBottom:10}}>
+              <div style={{fontSize:11,color:"var(--text4)",marginBottom:14,lineHeight:1.6}}>These items appear as checkboxes when logging each trade.</div>
+              {checklistItems.map((item,i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:"1px solid var(--border)"}}>
+                  <span style={{flex:1,fontSize:13,color:"var(--text2)"}}>{item}</span>
+                  <button onClick={()=>setChecklistItems(c=>c.filter((_,j)=>j!==i))}
+                    style={{background:"none",border:"none",color:"var(--text5)",fontSize:18,cursor:"pointer",padding:"2px 6px",flexShrink:0,transition:"color 0.15s"}}
+                    onMouseEnter={e=>e.target.style.color="#ff4d6d"} onMouseLeave={e=>e.target.style.color="var(--text5)"}>×</button>
+                </div>
+              ))}
+              <div style={{display:"flex",gap:8,marginTop:12}}>
+                <input className="field-input" placeholder="Add new item..." value={newCheckItem}
+                  onChange={e=>setNewCheckItem(e.target.value)}
+                  onKeyDown={e=>{if(e.key==="Enter"&&newCheckItem.trim()){setChecklistItems(c=>[...c,newCheckItem.trim()]);setNewCheckItem("");}}}
+                  style={{flex:1,fontSize:14,padding:"10px 12px"}}/>
+                <button className="btn-primary" style={{width:"auto",padding:"0 16px",fontSize:11,flexShrink:0}}
+                  onClick={()=>{if(newCheckItem.trim()){setChecklistItems(c=>[...c,newCheckItem.trim()]);setNewCheckItem("");}}}
+                >Add</button>
+              </div>
+            </div>
+
+            {/* Change PIN */}
+            <div className="stat-card" style={{marginBottom:10}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div>
+                  <div style={{fontSize:13,color:"var(--text)",marginBottom:2}}>Change PIN</div>
+                  <div style={{fontSize:11,color:"var(--text4)"}}>Update your 4-digit PIN</div>
+                </div>
+                <button onClick={()=>{
+                  localStorage.removeItem(PROFILE_KEY);
+                  setUnlocked(false);
+                }} style={{background:"none",border:"1px solid var(--border3)",borderRadius:6,padding:"7px 14px",color:"var(--text3)",fontFamily:"'DM Mono',monospace",fontSize:11,cursor:"pointer"}}>Reset</button>
+              </div>
+            </div>
+
+            {/* Data */}
+            <div style={{marginTop:20,marginBottom:8,fontSize:10,letterSpacing:"0.12em",color:"var(--text4)",textTransform:"uppercase"}}>Data</div>
+            <div className="stat-card" style={{marginBottom:10}}>
+              <div style={{fontSize:13,color:"var(--text)",marginBottom:12}}>Export Range</div>
+              <ExportSection trades={trades} balance={balance} curr={curr} stats={stats}/>
+            </div>
+
+            <div style={{marginTop:32,textAlign:"center"}}>
+              <div style={{fontSize:9,letterSpacing:"0.2em",color:"var(--text5)",textTransform:"uppercase"}}>Logged · Futures Journal</div>
+              <div style={{fontSize:11,color:"var(--text4)",marginTop:6,fontStyle:"italic",letterSpacing:"0.02em"}}>Logged it. Learned it. Owned it.</div>
+              <div style={{fontSize:9,color:"var(--text5)",marginTop:4}}>v1.0</div>
+            </div>
+          </>
+        )}
+
+        {/* GOALS */}
+        {view==="goals"&&<GoalsView trades={trades} goals={goals} setGoals={setGoals} fmt={fmt} calc={calc} goalColour={goalColour}/> }
+      </div>
+
+      {/* Bottom Nav */}
+      <div className="bottom-nav">
+        <button className={`nav-item${view==="journal"?" active":""}`} onClick={()=>setView("journal")}>
+          <div className="nav-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          Journal
+        </button>
+        <button className={`nav-item${view==="stats"?" active":""}`} onClick={()=>setView("stats")}>
+          <div className="nav-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+            </svg>
+          </div>
+          Stats
+        </button>
+        <button className={`nav-item${view==="add"?" active":""}`} onClick={()=>{setForm(blankForm());setEditId(null);setView("add");}}>
+          <div className="nav-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          Log
+        </button>
+        <button className={`nav-item${view==="goals"?" active":""}`} onClick={()=>setView("goals")}>
+          <div className="nav-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+          Goals
+        </button>
+        <button className={`nav-item${view==="settings"?" active":""}`} onClick={()=>setView("settings")}>
+          <div className="nav-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          Settings
+        </button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(<App/>);
+</script>
+</body>
+</html>
